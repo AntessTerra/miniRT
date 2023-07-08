@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 16:17:34 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/08 16:31:53 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ void	redraw(t_box *box)
 	int	x;
 
 	mlx_destroy_image(box->mlx, box->image.img);
-	box->image.img = mlx_new_image(box->mlx, 1280, 720);
+	box->image.img = mlx_new_image(box->mlx, SCREENWIDTH, SCREENHEIGHT);
 	box->image.addr = mlx_get_data_addr(box->image.img, &box->image.bits_pp,
 			&box->image.line_len, &box->image.endian);
 	x = -1;
-	while (++x < 1280)
+	while (++x < SCREENWIDTH)
 	{
 		reset_vals(box);
-		box->info.cameraX = 2 * x / (double)1280.0 - 1;
+		box->info.cameraX = 2 * x / (double)SCREENWIDTH - 1;
 		box->info.rayDirX = box->info.dirX + box->info.planeX * box->info.cameraX;
 		box->info.rayDirY = box->info.dirY + box->info.planeY * box->info.cameraX;
 		box->info.mapX = (int)box->info.posX;
@@ -91,13 +91,13 @@ void	redraw(t_box *box)
 			box->info.prepWallDist = (box->info.sideDistX - box->info.deltaDistX);
 		else
 			box->info.prepWallDist = (box->info.sideDistY - box->info.deltaDistY);
-		box->info.lineHeight = (int)(720 / box->info.prepWallDist);
-		box->info.drawStart = -box->info.lineHeight / 2 + 720 / 2;
+		box->info.lineHeight = (int)(SCREENHEIGHT / box->info.prepWallDist);
+		box->info.drawStart = -box->info.lineHeight / 2 + SCREENHEIGHT / 2;
 		if (box->info.drawStart < 0)
 			box->info.drawStart = 0;
-		box->info.drawEnd = box->info.lineHeight / 2 + 720 / 2;
-		if (box->info.drawEnd >= 720)
-			box->info.drawEnd = 720 - 1;
+		box->info.drawEnd = box->info.lineHeight / 2 + SCREENHEIGHT / 2;
+		if (box->info.drawEnd >= SCREENHEIGHT)
+			box->info.drawEnd = SCREENHEIGHT - 1;
 		if (box->map[box->info.mapX][box->info.mapY] == '1')
 			box->info.color = 0x00FF0000;
 		else if (box->map[box->info.mapX][box->info.mapY] == '2')

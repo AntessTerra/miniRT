@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 15:55:06 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/08 16:48:06 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,10 @@
 # include "Libft/libft.h"
 # include "minilibx/mlx.h"
 
-# define AMBIENT "A"
-# define CAMERA "C"
-# define LIGHT "L"
-# define SPEHRE "sp"
-# define PLANE "pl"
-# define CYLINDER "cy"
+# define SCREENWIDTH 1280
+# define SCREENHEIGHT 720
+# define TEXTUREWIDTH 64
+# define TEXTUREHEIGHT 64
 
 typedef struct s_atof
 {
@@ -72,6 +70,7 @@ typedef struct s_info
 	double	rotSpeed;
 	double	oldDirX;
 	double	oldPlaneX;
+	int		***texture;
 }				t_info;
 
 typedef struct s_image
@@ -81,8 +80,6 @@ typedef struct s_image
 	int		bits_pp;
 	int		line_len;
 	int		endian;
-	int		height;
-	int		width;
 }				t_image;
 
 typedef struct s_box
