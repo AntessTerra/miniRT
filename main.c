@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 16:57:26 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/08 18:17:27 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,20 +20,27 @@ void	init_textures(t_box *box)
 
 	n = 0;
 	box->info.texture = malloc(8 * sizeof(int *));
-	while (n++ < 8)
+	while (n < 8)
 	{
 		box->info.texture[n] = malloc(TEXTUREHEIGHT * sizeof(int *));
 		x = 0;
-		while (x++ < TEXTUREHEIGHT)
+		while (x < TEXTUREHEIGHT)
 		{
 			box->info.texture[n][x] = malloc(TEXTUREWIDTH * sizeof(int *));
+			y = 0;
+			while (y < TEXTUREWIDTH)
+			{
+				box->info.texture[n][x][y++] = 0;
+			}
+			x++;
 		}
+		n++;
 	}
 	x = 0;
-	while (x++ < TEXTUREHEIGHT)
+	while (x < TEXTUREHEIGHT)
 	{
 		y = 0;
-		while (y++ < TEXTUREWIDTH)
+		while (y < TEXTUREWIDTH)
 		{
 			int xorcolor = (x * 256 / TEXTUREWIDTH) ^ (y * 256 / TEXTUREHEIGHT);
 			//int xcolor = x * 256 / texWidth;
@@ -46,8 +53,9 @@ void	init_textures(t_box *box)
 			box->info.texture[4][x][y] = 256 * xorcolor; //xor green
 			box->info.texture[5][x][y] = 65536 * 192 * (x % 16 && y % 16); //red bricks
 			box->info.texture[6][x][y] = 65536 * ycolor; //red gradient
-			box->info.texture[7][x][y] = 128 + 256 * 128 + 65536 * 128; //flat grey
+			box->info.texture[7][x][y++] = 128 + 256 * 128 + 65536 * 128; //flat grey
 		}
+		x++;
 	}
 }
 
@@ -98,6 +106,8 @@ int	main(int argc, char **argv)
 {
 	t_box	box;
 	int		i;
+	int		k;
+	int		j;
 
 	check(&box, argc, argv);
 	i = 0;
@@ -107,6 +117,9 @@ int	main(int argc, char **argv)
 	}
 	box.mlx = mlx_init();
 	box.win = mlx_new_window(box.mlx, SCREENWIDTH, SCREENHEIGHT, "cub3d");
+	box.eagle.img = mlx_xpm_file_to_image(box.mlx, "textures/eagle.xpm", &k, &j);
+	box.eagle.addr = mlx_get_data_addr(box.eagle.img, &box.eagle.bits_pp,
+			&box.eagle.line_len, &box.eagle.endian);
 	box.image.img = mlx_new_image(box.mlx, SCREENWIDTH, SCREENHEIGHT);
 	box.image.addr = mlx_get_data_addr(box.image.img, &box.image.bits_pp,
 			&box.image.line_len, &box.image.endian);

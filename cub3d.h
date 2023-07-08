@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 16:48:06 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/08 18:14:14 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,12 @@ typedef struct s_info
 	double	oldDirX;
 	double	oldPlaneX;
 	int		***texture;
+	int		textNum;
+	double	wallX;
+	int		textX;
+	int		textY;
+	double	step;
+	double	texPos;
 }				t_info;
 
 typedef struct s_image
@@ -87,6 +93,7 @@ typedef struct s_box
 	void		*mlx;
 	void		*win;
 	t_image		image;
+	t_image		eagle;
 	char		**map;
 	t_info		info;
 	size_t		timer;

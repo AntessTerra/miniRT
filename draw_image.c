@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 16:31:53 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/08 19:05:18 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	reset_vals(t_box *box)
 	box->info.mapX = 0;
 	box->info.mapY = 0;
 	box->info.hit = 0;
+	box->info.textNum = 0;
 }
 
 void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
@@ -29,6 +30,11 @@ void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
 	pixel = image->addr + (y * image->line_len + x
 			* (image->bits_pp / 8));
 	*(unsigned int *)pixel = color;
+}
+
+int	extract_color(char *pixel)
+{
+	return (pixel[0] << 16 | pixel[1] << 8 | pixel[2]);
 }
 
 void	redraw(t_box *box)
@@ -98,23 +104,50 @@ void	redraw(t_box *box)
 		box->info.drawEnd = box->info.lineHeight / 2 + SCREENHEIGHT / 2;
 		if (box->info.drawEnd >= SCREENHEIGHT)
 			box->info.drawEnd = SCREENHEIGHT - 1;
+
+		box->info.textNum = box->map[box->info.mapX][box->info.mapY] - 1 - '0';
+		if (!box->info.side)
+			box->info.wallX = box->info.posY + box->info.prepWallDist * box->info.rayDirY;
+		else
+			box->info.wallX = box->info.posX + box->info.prepWallDist * box->info.rayDirX;
+		box->info.wallX -= floor((box->info.wallX));
+
+		box->info.textX = (int)box->info.wallX * (double)TEXTUREWIDTH;
+		if (!box->info.side && box->info.rayDirX > 0)
+			box->info.textX = TEXTUREWIDTH - box->info.textX - 1;
+		if (box->info.side && box->info.rayDirY < 0)
+			box->info.textX = TEXTUREWIDTH - box->info.textX - 1;
+
+		box->info.step = 1.0 * TEXTUREHEIGHT / box->info.lineHeight;
+		box->info.texPos = (box->info.drawStart - SCREENHEIGHT / 2 + box->info.lineHeight / 2) * box->info.step;
+
+		box->info.draw = box->info.drawStart;
+		while (box->info.draw++ < box->info.drawEnd)
+		{
+			box->info.textY = (int)box->info.texPos & (TEXTUREHEIGHT - 1);
+			box->info.texPos += box->info.step;
+			//box->info.color = box->info.texture[box->info.textNum][0][50];
+			//box->info.color = box->info.texture[box->info.textNum][box->info.textX][box->info.textY];
+			//printf("X: %i TEXTX: %i | TEXTY: %i\n", x, box->info.textX, box->info.textY);
+			box->info.color = extract_color(&box->eagle.addr[box->info.textX * 4 + box->eagle.line_len * box->info.textY]);
+			if (box->info.side)
+				box->info.color = (box->info.color >> 1) & 8355711;
+			my_mlx_pyxel_put(&box->image, x, box->info.draw, box->info.color);
+		}
+		/*
 		if (box->map[box->info.mapX][box->info.mapY] == '1')
 			box->info.color = 0x00FF0000;
 		else if (box->map[box->info.mapX][box->info.mapY] == '2')
 			box->info.color = 0x0000FF00;
-		else if (box->map[box->info.mapX][box->info.mapY] == '3')
+		else if (box->map[box->info.mapX][box->info.mapY] == '3')box->eagle.addr[box->info.textX * 4 + box->eagle.line_len * box->info.textY]
 			box->info.color = 0x000000FF;
 		else if (box->map[box->info.mapX][box->info.mapY] == '4')
 			box->info.color = 0x00FFFFFF;
 		else
 			box->info.color = 0x00FFFF00;
-		if (box->info.side)
-			box->info.color = box->info.color / 2;
-		box->info.draw = box->info.drawStart;
-		while (box->info.draw++ < box->info.drawEnd)
-		{
-			my_mlx_pyxel_put(&box->image, x, box->info.draw, box->info.color);
-		}
+		*/
+
+
 	}
 	box->info.oldTime = box->info.time;
 	box->info.time = box->timer;
