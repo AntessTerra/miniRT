@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 19:05:18 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/12 19:12:30 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,16 @@ void	reset_vals(t_box *box)
 
 void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
 {
-	char	*pixel;
+	unsigned char	*pixel;
 
 	pixel = image->addr + (y * image->line_len + x
 			* (image->bits_pp / 8));
 	*(unsigned int *)pixel = color;
 }
 
-int	extract_color(char *pixel)
+int	extract_color(unsigned char *pixel)
 {
-	return (pixel[0] << 16 | pixel[1] << 8 | pixel[2]);
+	return (pixel[2] << 16 | pixel[1] << 8 | pixel[0]);
 }
 
 void	redraw(t_box *box)
@@ -43,7 +43,7 @@ void	redraw(t_box *box)
 
 	mlx_destroy_image(box->mlx, box->image.img);
 	box->image.img = mlx_new_image(box->mlx, SCREENWIDTH, SCREENHEIGHT);
-	box->image.addr = mlx_get_data_addr(box->image.img, &box->image.bits_pp,
+	box->image.addr = (unsigned char *)mlx_get_data_addr(box->image.img, &box->image.bits_pp,
 			&box->image.line_len, &box->image.endian);
 	x = -1;
 	while (++x < SCREENWIDTH)
@@ -112,7 +112,7 @@ void	redraw(t_box *box)
 			box->info.wallX = box->info.posX + box->info.prepWallDist * box->info.rayDirX;
 		box->info.wallX -= floor((box->info.wallX));
 
-		box->info.textX = (int)box->info.wallX * (double)TEXTUREWIDTH;
+		box->info.textX = (int)(box->info.wallX * (double)TEXTUREWIDTH);
 		if (!box->info.side && box->info.rayDirX > 0)
 			box->info.textX = TEXTUREWIDTH - box->info.textX - 1;
 		if (box->info.side && box->info.rayDirY < 0)
@@ -129,7 +129,7 @@ void	redraw(t_box *box)
 			//box->info.color = box->info.texture[box->info.textNum][0][50];
 			//box->info.color = box->info.texture[box->info.textNum][box->info.textX][box->info.textY];
 			//printf("X: %i TEXTX: %i | TEXTY: %i\n", x, box->info.textX, box->info.textY);
-			box->info.color = extract_color(&box->eagle.addr[box->info.textX * 4 + box->eagle.line_len * box->info.textY]);
+			box->info.color = extract_color(&box->textures[box->info.textNum].addr[box->info.textX * 4 + box->textures[box->info.textNum].line_len * box->info.textY]);
 			if (box->info.side)
 				box->info.color = (box->info.color >> 1) & 8355711;
 			my_mlx_pyxel_put(&box->image, x, box->info.draw, box->info.color);

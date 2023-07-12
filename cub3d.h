@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 18:14:14 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/12 18:58:27 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ typedef struct s_info
 	double	rotSpeed;
 	double	oldDirX;
 	double	oldPlaneX;
-	int		***texture;
 	int		textNum;
 	double	wallX;
 	int		textX;
@@ -81,11 +80,11 @@ typedef struct s_info
 
 typedef struct s_image
 {
-	void	*img;
-	char	*addr;
-	int		bits_pp;
-	int		line_len;
-	int		endian;
+	void			*img;
+	unsigned char	*addr;
+	int				bits_pp;
+	int				line_len;
+	int				endian;
 }				t_image;
 
 typedef struct s_box
@@ -93,7 +92,7 @@ typedef struct s_box
 	void		*mlx;
 	void		*win;
 	t_image		image;
-	t_image		eagle;
+	t_image		*textures;
 	char		**map;
 	t_info		info;
 	size_t		timer;

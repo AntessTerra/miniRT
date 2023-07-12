@@ -6,58 +6,11 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/08 18:17:27 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/12 19:12:15 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	init_textures(t_box *box)
-{
-	int	n;
-	int	x;
-	int	y;
-
-	n = 0;
-	box->info.texture = malloc(8 * sizeof(int *));
-	while (n < 8)
-	{
-		box->info.texture[n] = malloc(TEXTUREHEIGHT * sizeof(int *));
-		x = 0;
-		while (x < TEXTUREHEIGHT)
-		{
-			box->info.texture[n][x] = malloc(TEXTUREWIDTH * sizeof(int *));
-			y = 0;
-			while (y < TEXTUREWIDTH)
-			{
-				box->info.texture[n][x][y++] = 0;
-			}
-			x++;
-		}
-		n++;
-	}
-	x = 0;
-	while (x < TEXTUREHEIGHT)
-	{
-		y = 0;
-		while (y < TEXTUREWIDTH)
-		{
-			int xorcolor = (x * 256 / TEXTUREWIDTH) ^ (y * 256 / TEXTUREHEIGHT);
-			//int xcolor = x * 256 / texWidth;
-			int ycolor = y * 256 / TEXTUREHEIGHT;
-			int xycolor = y * 128 / TEXTUREHEIGHT + x * 128 / TEXTUREWIDTH;
-			box->info.texture[0][x][y] = 65536 * 254 * (x != y && x != TEXTUREWIDTH - y); //flat red with black cross
-			box->info.texture[1][x][y] = xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
-			box->info.texture[2][x][y] = 256 * xycolor + 65536 * xycolor; //sloped yellow gradient
-			box->info.texture[3][x][y] = xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
-			box->info.texture[4][x][y] = 256 * xorcolor; //xor green
-			box->info.texture[5][x][y] = 65536 * 192 * (x % 16 && y % 16); //red bricks
-			box->info.texture[6][x][y] = 65536 * ycolor; //red gradient
-			box->info.texture[7][x][y++] = 128 + 256 * 128 + 65536 * 128; //flat grey
-		}
-		x++;
-	}
-}
 
 void	init_vals(t_box *box)
 {
@@ -89,7 +42,6 @@ void	check(t_box *box, int argc, char **argv)
 		return (printf("Error\nCannot open file.\n"), exit(1));
 	parser(box, fd);
 	init_vals(box);
-	init_textures(box);
 	close(fd);
 }
 
@@ -110,18 +62,36 @@ int	main(int argc, char **argv)
 	int		j;
 
 	check(&box, argc, argv);
-	i = 0;
-	while (i < 100)
-	{
-		printf("%s", box.map[i++]);
-	}
 	box.mlx = mlx_init();
 	box.win = mlx_new_window(box.mlx, SCREENWIDTH, SCREENHEIGHT, "cub3d");
-	box.eagle.img = mlx_xpm_file_to_image(box.mlx, "textures/eagle.xpm", &k, &j);
-	box.eagle.addr = mlx_get_data_addr(box.eagle.img, &box.eagle.bits_pp,
-			&box.eagle.line_len, &box.eagle.endian);
+	box.textures = malloc(8 * sizeof(t_image));
+	box.textures[0].img = mlx_xpm_file_to_image(box.mlx, "textures/eagle.xpm", &k, &j);
+	box.textures[0].addr = (unsigned char *)mlx_get_data_addr(box.textures[0].img, &box.textures[0].bits_pp,
+			&box.textures[0].line_len, &box.textures[0].endian);
+	box.textures[1].img = mlx_xpm_file_to_image(box.mlx, "textures/redbrick.xpm", &k, &j);
+	box.textures[1].addr = (unsigned char *)mlx_get_data_addr(box.textures[1].img, &box.textures[1].bits_pp,
+			&box.textures[1].line_len, &box.textures[1].endian);
+	box.textures[2].img = mlx_xpm_file_to_image(box.mlx, "textures/purplestone.xpm", &k, &j);
+	box.textures[2].addr = (unsigned char *)mlx_get_data_addr(box.textures[2].img, &box.textures[2].bits_pp,
+			&box.textures[2].line_len, &box.textures[2].endian);
+	box.textures[3].img = mlx_xpm_file_to_image(box.mlx, "textures/greystone.xpm", &k, &j);
+	box.textures[3].addr = (unsigned char *)mlx_get_data_addr(box.textures[3].img, &box.textures[3].bits_pp,
+			&box.textures[3].line_len, &box.textures[3].endian);
+	box.textures[4].img = mlx_xpm_file_to_image(box.mlx, "textures/bluestone.xpm", &k, &j);
+	box.textures[4].addr = (unsigned char *)mlx_get_data_addr(box.textures[4].img, &box.textures[4].bits_pp,
+			&box.textures[4].line_len, &box.textures[4].endian);
+	box.textures[5].img = mlx_xpm_file_to_image(box.mlx, "textures/mossy.xpm", &k, &j);
+	box.textures[5].addr = (unsigned char *)mlx_get_data_addr(box.textures[5].img, &box.textures[5].bits_pp,
+			&box.textures[5].line_len, &box.textures[5].endian);
+	box.textures[6].img = mlx_xpm_file_to_image(box.mlx, "textures/wood.xpm", &k, &j);
+	box.textures[6].addr = (unsigned char *)mlx_get_data_addr(box.textures[6].img, &box.textures[6].bits_pp,
+			&box.textures[6].line_len, &box.textures[6].endian);
+	box.textures[7].img = mlx_xpm_file_to_image(box.mlx, "textures/colorstone.xpm", &k, &j);
+	box.textures[7].addr = (unsigned char *)mlx_get_data_addr(box.textures[7].img, &box.textures[7].bits_pp,
+			&box.textures[7].line_len, &box.textures[7].endian);
+
 	box.image.img = mlx_new_image(box.mlx, SCREENWIDTH, SCREENHEIGHT);
-	box.image.addr = mlx_get_data_addr(box.image.img, &box.image.bits_pp,
+	box.image.addr = (unsigned char *)mlx_get_data_addr(box.image.img, &box.image.bits_pp,
 			&box.image.line_len, &box.image.endian);
 	redraw(&box);
 	mlx_hook(box.win, 17, 0, exit_hook, &box);
