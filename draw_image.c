@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/12 19:12:30 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/13 15:36:26 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	reset_vals(t_box *box)
 	box->info.mapY = 0;
 	box->info.hit = 0;
 	box->info.textNum = 0;
+	box->info.color = 0;
 }
 
 void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
@@ -40,11 +41,61 @@ int	extract_color(unsigned char *pixel)
 void	redraw(t_box *box)
 {
 	int	x;
+	int	y;
 
 	mlx_destroy_image(box->mlx, box->image.img);
 	box->image.img = mlx_new_image(box->mlx, SCREENWIDTH, SCREENHEIGHT);
 	box->image.addr = (unsigned char *)mlx_get_data_addr(box->image.img, &box->image.bits_pp,
 			&box->image.line_len, &box->image.endian);
+	//FLOOR CASTING
+
+	y = -1;
+	while (++y < SCREENHEIGHT)
+	{
+		reset_vals(box);
+		box->info.rayDirX0 = box->info.dirX - box->info.planeX;
+		box->info.rayDirY0 = box->info.dirY - box->info.planeY;
+		box->info.rayDirX1 = box->info.dirX + box->info.planeX;
+		box->info.rayDirY1 = box->info.dirY + box->info.planeY;
+
+		box->info.p = y - SCREENHEIGHT / 2;
+
+		box->info.posZ = 0.5 * SCREENHEIGHT;
+
+		box->info.rowDistance = box->info.posZ / box->info.p;
+
+		box->info.floorStepX = box->info.rowDistance * (box->info.rayDirX1 - box->info.rayDirX0) / SCREENWIDTH;
+		box->info.floorStepY = box->info.rowDistance * (box->info.rayDirY1 - box->info.rayDirY0) / SCREENWIDTH;
+
+		box->info.floorX = box->info.posX + box->info.rowDistance * box->info.rayDirX0;
+		box->info.floorY = box->info.posY + box->info.rowDistance * box->info.rayDirY0;
+
+		x = -1;
+		while (++x < SCREENWIDTH)
+		{
+			box->info.cellX = (int)(box->info.floorX);
+			box->info.cellY = (int)(box->info.floorY);
+
+			box->info.tx = (int)(TEXTUREWIDTH * (box->info.floorX - box->info.cellX)) & (TEXTUREWIDTH - 1);
+			box->info.ty = (int)(TEXTUREHEIGHT * (box->info.floorY - box->info.cellY)) & (TEXTUREHEIGHT - 1);
+
+			box->info.floorX += box->info.floorStepX;
+			box->info.floorY += box->info.floorStepY;
+
+			box->info.floorTexture = 3;
+			box->info.ceilingTexture = 6;
+
+			box->info.color = extract_color(&box->textures[box->info.floorTexture].addr[box->info.tx * 4 + box->textures[box->info.floorTexture].line_len * box->info.ty]);
+			box->info.color = (box->info.color >> 1) & 8355711;
+			my_mlx_pyxel_put(&box->image, x, y, box->info.color);
+
+			box->info.color = extract_color(&box->textures[box->info.ceilingTexture].addr[box->info.tx * 4 + box->textures[box->info.ceilingTexture].line_len * box->info.ty]);
+			box->info.color = (box->info.color >> 1) & 8355711;
+			my_mlx_pyxel_put(&box->image, x, SCREENHEIGHT - y - 1, box->info.color);
+		}
+	}
+
+	//WALL CASTING
 	x = -1;
 	while (++x < SCREENWIDTH)
 	{

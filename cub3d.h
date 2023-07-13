@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/12 18:58:27 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/13 15:12:07 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_atof
 
 typedef struct s_info
 {
+	//Plain
 	double	posX;
 	double	posY;
 	double	dirX;
@@ -70,12 +71,31 @@ typedef struct s_info
 	double	rotSpeed;
 	double	oldDirX;
 	double	oldPlaneX;
+	//Textures
 	int		textNum;
 	double	wallX;
 	int		textX;
 	int		textY;
 	double	step;
 	double	texPos;
+	//Floor
+	float	rayDirX0;
+	float	rayDirY0;
+	float	rayDirX1;
+	float	rayDirY1;
+	int		p;
+	float	posZ;
+	float	rowDistance;
+	float	floorStepX;
+	float	floorStepY;
+	float	floorX;
+	float	floorY;
+	int		cellX;
+	int		cellY;
+	int		tx;
+	int		ty;
+	int		floorTexture;
+	int		ceilingTexture;
 }				t_info;
 
 typedef struct s_image
