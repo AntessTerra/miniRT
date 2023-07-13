@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/12 19:12:15 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/13 15:02:43 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,14 @@ int	main(int argc, char **argv)
 	mlx_loop(box.mlx);
 
 	i = 0;
-	while (i < 100)
-	{
+	while (i < 200)
 		free(box.map[i++]);
-	}
 	free(box.map);
+	i = 0;
+	while (i < 8)
+	{
+		free(box.textures[i].img);
+		free(box.textures[i++].addr);
+	}
 	return (0);
 }
