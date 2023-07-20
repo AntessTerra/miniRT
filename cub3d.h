@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/13 15:12:07 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/20 15:41:51 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,6 @@
 # define SCREENHEIGHT 720
 # define TEXTUREWIDTH 64
 # define TEXTUREHEIGHT 64
-
-typedef struct s_atof
-{
-	float	val;
-	int		afterdot;
-	float	scale;
-	int		sign;
-}				t_atof;
 
 typedef struct s_info
 {
@@ -96,6 +88,25 @@ typedef struct s_info
 	int		ty;
 	int		floorTexture;
 	int		ceilingTexture;
+	//Sprites
+	double	*Zbuffer;
+	double	spriteX;
+	double	spriteY;
+	double	invDet;
+	double	transformX;
+	double	transformY;
+	int		spriteScreenX;
+	int		spriteHeight;
+	int		spriteWidth;
+	int		drawStartX;
+	int		drawStartY;
+	int		drawEndX;
+	int		drawEndY;
+	int		texX;
+	int		d;
+	int		texY;
+	int		stripe;
+	int		part;
 }				t_info;
 
 typedef struct s_image
@@ -107,12 +118,22 @@ typedef struct s_image
 	int				endian;
 }				t_image;
 
+typedef struct s_sprite
+{
+	double	x;
+	double	y;
+	int		texture;
+	double	dist;
+}				t_sprite;
+
 typedef struct s_box
 {
 	void		*mlx;
 	void		*win;
 	t_image		image;
 	t_image		*textures;
+	t_sprite	*sprites;
+	int			n_sprites;
 	char		**map;
 	t_info		info;
 	size_t		timer;

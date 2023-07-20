@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/13 15:36:26 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/20 17:31:17 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,17 +38,63 @@ int	extract_color(unsigned char *pixel)
 	return (pixel[2] << 16 | pixel[1] << 8 | pixel[0]);
 }
 
+
+void	swap(t_sprite *x, t_sprite *y)
+{
+	t_sprite	tmp;
+
+	tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+
+void	bubbleSortSprites(t_box *box)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i++ < box->n_sprites)
+		box->sprites[i].dist = ((box->info.posX - box->sprites[i].x) * (box->info.posX - box->sprites[i].x) + (box->info.posY - box->sprites[i].y) * (box->info.posY - box->sprites[i].y));
+/*
+	i = 0;
+	while (i++ < box->n_sprites)
+		printf("BEFORE %i | %f\n", i, box->sprites[i].dist);
+*/
+	i = 0;
+	while (i++ < box->n_sprites - 1)
+	{
+		j = 0;
+		while (j++ < box->n_sprites - i - 1)
+			if (box->sprites[j].dist > box->sprites[j + 1].dist)
+				swap(&box->sprites[j], &box->sprites[j + 1]);
+	}
+
+	i = -1;
+	while (++i < box->n_sprites / 2)
+	{
+		swap(&box->sprites[i], &box->sprites[box->n_sprites - i - 1]);
+	}
+
+/*
+	i = 0;
+	while (i++ < box->n_sprites)
+		printf("AFTER %i | %f\n", i, box->sprites[i].dist);
+*/
+}
+
 void	redraw(t_box *box)
 {
 	int	x;
 	int	y;
+	int	i;
 
 	mlx_destroy_image(box->mlx, box->image.img);
 	box->image.img = mlx_new_image(box->mlx, SCREENWIDTH, SCREENHEIGHT);
 	box->image.addr = (unsigned char *)mlx_get_data_addr(box->image.img, &box->image.bits_pp,
 			&box->image.line_len, &box->image.endian);
-	//FLOOR CASTING
 
+	//FLOOR CASTING
 	y = -1;
 	while (++y < SCREENHEIGHT)
 	{
@@ -177,29 +223,73 @@ void	redraw(t_box *box)
 		{
 			box->info.textY = (int)box->info.texPos & (TEXTUREHEIGHT - 1);
 			box->info.texPos += box->info.step;
-			//box->info.color = box->info.texture[box->info.textNum][0][50];
-			//box->info.color = box->info.texture[box->info.textNum][box->info.textX][box->info.textY];
-			//printf("X: %i TEXTX: %i | TEXTY: %i\n", x, box->info.textX, box->info.textY);
 			box->info.color = extract_color(&box->textures[box->info.textNum].addr[box->info.textX * 4 + box->textures[box->info.textNum].line_len * box->info.textY]);
 			if (box->info.side)
 				box->info.color = (box->info.color >> 1) & 8355711;
 			my_mlx_pyxel_put(&box->image, x, box->info.draw, box->info.color);
 		}
-		/*
-		if (box->map[box->info.mapX][box->info.mapY] == '1')
-			box->info.color = 0x00FF0000;
-		else if (box->map[box->info.mapX][box->info.mapY] == '2')
-			box->info.color = 0x0000FF00;
-		else if (box->map[box->info.mapX][box->info.mapY] == '3')box->eagle.addr[box->info.textX * 4 + box->eagle.line_len * box->info.textY]
-			box->info.color = 0x000000FF;
-		else if (box->map[box->info.mapX][box->info.mapY] == '4')
-			box->info.color = 0x00FFFFFF;
-		else
-			box->info.color = 0x00FFFF00;
-		*/
+		box->info.Zbuffer[x] = box->info.prepWallDist;
+		//printf("%i: %f\n", x, box->info.Zbuffer[x]);
+	}
+
+	//SPRITE CASTING
+	//printf("now %i\n", box->n_sprites);
+	bubbleSortSprites(box);
+	i = -1;
+	while (++i < box->n_sprites)
+	{
+		box->info.spriteX = box->sprites[i].x - box->info.posX;
+		box->info.spriteY = box->sprites[i].y - box->info.posY;
+		box->info.invDet = 1.0 / (box->info.planeX * box->info.dirY - box->info.dirX * box->info.planeY);
+		box->info.transformX = box->info.invDet * (box->info.dirY * box->info.spriteX - box->info.dirX * box->info.spriteY);
+		box->info.transformY = box->info.invDet * (-box->info.planeY * box->info.spriteX + box->info.planeX * box->info.spriteY);
+		box->info.spriteScreenX = (int)((SCREENWIDTH / 2) * (1 + box->info.transformX / box->info.transformY));
+
+		box->info.spriteHeight = abs((int)(SCREENHEIGHT / (box->info.transformY)));
+
+		box->info.drawStartY = -box->info.spriteHeight / 2 + SCREENHEIGHT / 2;
+		if (box->info.drawStartY < 0)
+			box->info.drawStartY = 0;
+
+		box->info.drawEndY = box->info.spriteHeight / 2 + SCREENHEIGHT / 2;
+		if (box->info.drawEndY >= SCREENHEIGHT)
+			box->info.drawEndY = SCREENHEIGHT - 1;
+
+		box->info.spriteWidth = abs((int)(SCREENHEIGHT / (box->info.transformY)));
+
+		box->info.drawStartX = -box->info.spriteWidth / 2 + box->info.spriteScreenX;
+		if (box->info.drawStartX < 0)
+			box->info.drawStartX = 0;
+
+		box->info.drawEndX = box->info.spriteWidth / 2 + box->info.spriteScreenX;
+		if (box->info.drawEndX >= SCREENWIDTH)
+			box->info.drawEndX = SCREENWIDTH - 1;
+
+		box->info.stripe = box->info.drawStartX;
+
+		while (box->info.stripe++ < box->info.drawEndX)
+		{
+			box->info.texX = (int)(256 * (box->info.stripe - (-box->info.spriteWidth / 2 + box->info.spriteScreenX)) * TEXTUREWIDTH / box->info.spriteWidth) / 256;
+
+			if (box->info.transformY > 0 && box->info.transformY < box->info.Zbuffer[box->info.stripe])
+			{
+				//printf("Sprite n: %i // %f > 0 | %d > 0 | %d < %d | %f < %f\n", i, box->info.transformY, box->info.stripe, box->info.stripe, SCREENWIDTH, box->info.transformY, box->info.Zbuffer[box->info.stripe]);
+				box->info.part = box->info.drawStartY;
+				while (box->info.part++ < box->info.drawEndY)
+				{
+					box->info.d = (box->info.part) * 256 - SCREENHEIGHT * 128 + box->info.spriteHeight * 128;
+					box->info.texY = ((box->info.d * TEXTUREHEIGHT) / box->info.spriteHeight) / 256;
+					//printf("Color from: %i\n", box->sprites[i].texture);
+					box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[box->info.texX * 4 + box->textures[box->sprites[i].texture].line_len * box->info.texY]);
+					if ((box->info.color & 0x00FFFFFF) != 0)
+						my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, box->info.color);
+				}
+			}
+		}
 
 
 	}
+
 	box->info.oldTime = box->info.time;
 	box->info.time = box->timer;
 	box->info.frameTime = (box->info.time - box->info.oldTime) / 1000.0;

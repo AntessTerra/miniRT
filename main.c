@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/13 15:02:43 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/20 17:37:11 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,17 @@ void	init_vals(t_box *box)
 	box->timer = 0;
 	box->info.oldDirX = 0;
 	box->info.oldPlaneX = 0;
+	box->info.Zbuffer = malloc(SCREENWIDTH * sizeof(double));
+}
+
+int	count_sprites(t_box *box)
+{
+	int	i;
+
+	i = 0;
+	while (box->sprites[i].x != 0)
+		i++;
+	return (i);
 }
 
 void	check(t_box *box, int argc, char **argv)
@@ -42,6 +53,7 @@ void	check(t_box *box, int argc, char **argv)
 		return (printf("Error\nCannot open file.\n"), exit(1));
 	parser(box, fd);
 	init_vals(box);
+	box->n_sprites = count_sprites(box);
 	close(fd);
 }
 
@@ -64,7 +76,8 @@ int	main(int argc, char **argv)
 	check(&box, argc, argv);
 	box.mlx = mlx_init();
 	box.win = mlx_new_window(box.mlx, SCREENWIDTH, SCREENHEIGHT, "cub3d");
-	box.textures = malloc(8 * sizeof(t_image));
+	//Init Textures
+	box.textures = malloc(11 * sizeof(t_image));
 	box.textures[0].img = mlx_xpm_file_to_image(box.mlx, "textures/eagle.xpm", &k, &j);
 	box.textures[0].addr = (unsigned char *)mlx_get_data_addr(box.textures[0].img, &box.textures[0].bits_pp,
 			&box.textures[0].line_len, &box.textures[0].endian);
@@ -89,6 +102,16 @@ int	main(int argc, char **argv)
 	box.textures[7].img = mlx_xpm_file_to_image(box.mlx, "textures/colorstone.xpm", &k, &j);
 	box.textures[7].addr = (unsigned char *)mlx_get_data_addr(box.textures[7].img, &box.textures[7].bits_pp,
 			&box.textures[7].line_len, &box.textures[7].endian);
+	//Init Sprites
+	box.textures[8].img = mlx_xpm_file_to_image(box.mlx, "textures/barrel.xpm", &k, &j);
+	box.textures[8].addr = (unsigned char *)mlx_get_data_addr(box.textures[8].img, &box.textures[8].bits_pp,
+			&box.textures[8].line_len, &box.textures[8].endian);
+	box.textures[9].img = mlx_xpm_file_to_image(box.mlx, "textures/pillar.xpm", &k, &j);
+	box.textures[9].addr = (unsigned char *)mlx_get_data_addr(box.textures[9].img, &box.textures[9].bits_pp,
+			&box.textures[9].line_len, &box.textures[9].endian);
+	box.textures[10].img = mlx_xpm_file_to_image(box.mlx, "textures/greenlight.xpm", &k, &j);
+	box.textures[10].addr = (unsigned char *)mlx_get_data_addr(box.textures[10].img, &box.textures[10].bits_pp,
+			&box.textures[10].line_len, &box.textures[10].endian);
 
 	box.image.img = mlx_new_image(box.mlx, SCREENWIDTH, SCREENHEIGHT);
 	box.image.addr = (unsigned char *)mlx_get_data_addr(box.image.img, &box.image.bits_pp,
@@ -101,14 +124,17 @@ int	main(int argc, char **argv)
 	mlx_loop(box.mlx);
 
 	i = 0;
-	while (i < 200)
+	while (i < 100)
 		free(box.map[i++]);
 	free(box.map);
 	i = 0;
-	while (i < 8)
+	while (i++ < 11)
 	{
 		free(box.textures[i].img);
-		free(box.textures[i++].addr);
+		free(box.textures[i].addr);
 	}
+	free(box.textures);
+	free(box.info.Zbuffer);
+	free(box.sprites);
 	return (0);
 }
