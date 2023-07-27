@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/27 14:48:21 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 15:40:13 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,16 +311,16 @@ void	redraw(t_box *box)
 	}
 	if (box->info.move_y == 1)
 	{
-		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirY * box->info.moveSpeed)] == '0')
+		if (box->map[(int)(box->info.posX + box->info.dirY * box->info.moveSpeed)][(int)(box->info.posY)] == '0')
 			box->info.posX += box->info.dirY * box->info.moveSpeed;
-		if (box->map[(int)(box->info.posX + box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY - box->info.dirX * box->info.moveSpeed)] == '0')
 			box->info.posY -= box->info.dirX * box->info.moveSpeed;
 	}
 	else if (box->info.move_y == -1)
 	{
-		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirY * box->info.moveSpeed)] == '0')
+		if (box->map[(int)(box->info.posX - box->info.dirY * box->info.moveSpeed)][(int)(box->info.posY)] == '0')
 			box->info.posX -= box->info.dirY * box->info.moveSpeed;
-		if (box->map[(int)(box->info.posX + box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirX * box->info.moveSpeed)] == '0')
 			box->info.posY += box->info.dirX * box->info.moveSpeed;
 	}
 
