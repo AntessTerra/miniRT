@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/20 15:41:51 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 12:25:05 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@
 
 typedef struct s_info
 {
+	//Movement
+	int		move_y;
+	int		move_x;
+	int		rotate;
 	//Plain
 	double	posX;
 	double	posY;
@@ -140,7 +144,8 @@ typedef struct s_box
 }				t_box;
 
 int		exit_hook(t_box *box);
-int		key_hook(int key, t_box *box);
+int		key_press(int key, t_box *box);
+int		key_release(int key, t_box *box);
 void	parser(t_box *box, int fd);
 void	redraw(t_box *box);
 

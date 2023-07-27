@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/20 17:31:17 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 14:48:21 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,6 @@ void	bubbleSortSprites(t_box *box)
 	i = 0;
 	while (i++ < box->n_sprites)
 		box->sprites[i].dist = ((box->info.posX - box->sprites[i].x) * (box->info.posX - box->sprites[i].x) + (box->info.posY - box->sprites[i].y) * (box->info.posY - box->sprites[i].y));
-/*
-	i = 0;
-	while (i++ < box->n_sprites)
-		printf("BEFORE %i | %f\n", i, box->sprites[i].dist);
-*/
 	i = 0;
 	while (i++ < box->n_sprites - 1)
 	{
@@ -69,18 +64,9 @@ void	bubbleSortSprites(t_box *box)
 			if (box->sprites[j].dist > box->sprites[j + 1].dist)
 				swap(&box->sprites[j], &box->sprites[j + 1]);
 	}
-
 	i = -1;
 	while (++i < box->n_sprites / 2)
-	{
 		swap(&box->sprites[i], &box->sprites[box->n_sprites - i - 1]);
-	}
-
-/*
-	i = 0;
-	while (i++ < box->n_sprites)
-		printf("AFTER %i | %f\n", i, box->sprites[i].dist);
-*/
 }
 
 void	redraw(t_box *box)
@@ -288,6 +274,54 @@ void	redraw(t_box *box)
 		}
 
 
+	}
+
+	//Movement
+	if (box->info.rotate == 1)
+	{
+		box->info.oldDirX = box->info.dirX;
+		box->info.dirX = box->info.dirX * cos(-box->info.rotSpeed) - box->info.dirY * sin(-box->info.rotSpeed);
+		box->info.dirY = box->info.oldDirX * sin(-box->info.rotSpeed) + box->info.dirY * cos(-box->info.rotSpeed);
+		box->info.oldPlaneX = box->info.planeX;
+		box->info.planeX = box->info.planeX * cos(-box->info.rotSpeed) - box->info.planeY * sin(-box->info.rotSpeed);
+		box->info.planeY = box->info.oldPlaneX * sin(-box->info.rotSpeed) + box->info.planeY * cos(-box->info.rotSpeed);
+	}
+	else if (box->info.rotate == -1)
+	{
+		box->info.oldDirX = box->info.dirX;
+		box->info.dirX = box->info.dirX * cos(box->info.rotSpeed) - box->info.dirY * sin(box->info.rotSpeed);
+		box->info.dirY = box->info.oldDirX * sin(box->info.rotSpeed) + box->info.dirY * cos(box->info.rotSpeed);
+		box->info.oldPlaneX = box->info.planeX;
+		box->info.planeX = box->info.planeX * cos(box->info.rotSpeed) - box->info.planeY * sin(box->info.rotSpeed);
+		box->info.planeY = box->info.oldPlaneX * sin(box->info.rotSpeed) + box->info.planeY * cos(box->info.rotSpeed);
+	}
+	if (box->info.move_x == 1)
+	{
+		if (box->map[(int)(box->info.posX + box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+			box->info.posX += box->info.dirX * box->info.moveSpeed;
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirY * box->info.moveSpeed)] == '0')
+			box->info.posY += box->info.dirY * box->info.moveSpeed;
+	}
+	else if (box->info.move_x == -1)
+	{
+		if (box->map[(int)(box->info.posX - box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+			box->info.posX -= box->info.dirX * box->info.moveSpeed;
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY - box->info.dirY * box->info.moveSpeed)] == '0')
+			box->info.posY -= box->info.dirY * box->info.moveSpeed;
+	}
+	if (box->info.move_y == 1)
+	{
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirY * box->info.moveSpeed)] == '0')
+			box->info.posX += box->info.dirY * box->info.moveSpeed;
+		if (box->map[(int)(box->info.posX + box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+			box->info.posY -= box->info.dirX * box->info.moveSpeed;
+	}
+	else if (box->info.move_y == -1)
+	{
+		if (box->map[(int)(box->info.posX)][(int)(box->info.posY + box->info.dirY * box->info.moveSpeed)] == '0')
+			box->info.posX -= box->info.dirY * box->info.moveSpeed;
+		if (box->map[(int)(box->info.posX + box->info.dirX * box->info.moveSpeed)][(int)box->info.posY] == '0')
+			box->info.posY += box->info.dirX * box->info.moveSpeed;
 	}
 
 	box->info.oldTime = box->info.time;

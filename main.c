@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/20 17:37:11 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 14:51:28 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ void	init_vals(t_box *box)
 	box->info.cameraX = 0;
 	box->info.rayDirX = 0;
 	box->info.rayDirY = 0;
+	box->info.rotate = 0;
+	box->info.move_x = 0;
+	box->info.move_y = 0;
 	box->info.hit = 0;
 	box->timer = 0;
 	box->info.oldDirX = 0;
@@ -118,7 +121,8 @@ int	main(int argc, char **argv)
 			&box.image.line_len, &box.image.endian);
 	redraw(&box);
 	mlx_hook(box.win, 17, 0, exit_hook, &box);
-	mlx_hook(box.win, 2, 1L<<0, key_hook, &box);
+	mlx_hook(box.win, 2, 1L<<0, key_press, &box);
+	mlx_hook(box.win, 3, 1L<<1, key_release, &box);
 	//mlx_key_hook(box.win, key_hook, &box);
 	mlx_loop_hook(box.mlx, timer, &box);
 	mlx_loop(box.mlx);
