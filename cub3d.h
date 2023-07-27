@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/27 12:25:05 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 16:18:38 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,9 @@
 
 typedef struct s_info
 {
-	//Movement
 	int		move_y;
 	int		move_x;
 	int		rotate;
-	//Plain
 	double	posX;
 	double	posY;
 	double	dirX;
@@ -67,14 +65,12 @@ typedef struct s_info
 	double	rotSpeed;
 	double	oldDirX;
 	double	oldPlaneX;
-	//Textures
 	int		textNum;
 	double	wallX;
 	int		textX;
 	int		textY;
 	double	step;
 	double	texPos;
-	//Floor
 	float	rayDirX0;
 	float	rayDirY0;
 	float	rayDirX1;
@@ -92,7 +88,6 @@ typedef struct s_info
 	int		ty;
 	int		floorTexture;
 	int		ceilingTexture;
-	//Sprites
 	double	*Zbuffer;
 	double	spriteX;
 	double	spriteY;
@@ -148,5 +143,9 @@ int		key_press(int key, t_box *box);
 int		key_release(int key, t_box *box);
 void	parser(t_box *box, int fd);
 void	redraw(t_box *box);
+void	init_vals(t_box *box);
+void	init_textures(t_box *box);
+void	reset_vals(t_box *box);
+void	bubble_sort_sprites(t_box *box);
 
 #endif

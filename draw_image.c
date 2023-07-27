@@ -6,23 +6,11 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/27 15:40:13 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 16:18:52 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	reset_vals(t_box *box)
-{
-	box->info.cameraX = 0;
-	box->info.rayDirX = 0;
-	box->info.rayDirY = 0;
-	box->info.mapX = 0;
-	box->info.mapY = 0;
-	box->info.hit = 0;
-	box->info.textNum = 0;
-	box->info.color = 0;
-}
 
 void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
 {
@@ -36,37 +24,6 @@ void	my_mlx_pyxel_put(t_image *image, int x, int y, int color)
 int	extract_color(unsigned char *pixel)
 {
 	return (pixel[2] << 16 | pixel[1] << 8 | pixel[0]);
-}
-
-
-void	swap(t_sprite *x, t_sprite *y)
-{
-	t_sprite	tmp;
-
-	tmp = *x;
-	*x = *y;
-	*y = tmp;
-}
-
-void	bubbleSortSprites(t_box *box)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	while (i++ < box->n_sprites)
-		box->sprites[i].dist = ((box->info.posX - box->sprites[i].x) * (box->info.posX - box->sprites[i].x) + (box->info.posY - box->sprites[i].y) * (box->info.posY - box->sprites[i].y));
-	i = 0;
-	while (i++ < box->n_sprites - 1)
-	{
-		j = 0;
-		while (j++ < box->n_sprites - i - 1)
-			if (box->sprites[j].dist > box->sprites[j + 1].dist)
-				swap(&box->sprites[j], &box->sprites[j + 1]);
-	}
-	i = -1;
-	while (++i < box->n_sprites / 2)
-		swap(&box->sprites[i], &box->sprites[box->n_sprites - i - 1]);
 }
 
 void	redraw(t_box *box)
@@ -220,7 +177,7 @@ void	redraw(t_box *box)
 
 	//SPRITE CASTING
 	//printf("now %i\n", box->n_sprites);
-	bubbleSortSprites(box);
+	bubble_sort_sprites(box);
 	i = -1;
 	while (++i < box->n_sprites)
 	{

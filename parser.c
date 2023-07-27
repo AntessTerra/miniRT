@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 18:29:34 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/20 17:39:08 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/27 16:19:31 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,13 @@ void	parser(t_box *box, int fd)
 		while (line[s] != ',' && line[s] != '\n')
 			s++;
 		s++;
-		box->sprites[i].y = atof(line + s);;
+		box->sprites[i].y = atof(line + s);
 		while (line[s] != ',' && line[s] != '\n')
 			s++;
 		s++;
 		box->sprites[i].texture = atof(line + s);
 		free(line);
 		line = get_next_line(fd);
-		//printf("Test%i x:%f | y:%f | texture:%i\n", i, box->sprites[i].x, box->sprites[i].y, box->sprites[i].texture);
 		i++;
 	}
 	free(line);
