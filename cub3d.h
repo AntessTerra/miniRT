@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
+/*   By: antess <antess@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/27 16:18:38 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/07/30 14:00:28 by antess           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,87 +25,95 @@
 
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
-# define TEXTUREWIDTH 64
-# define TEXTUREHEIGHT 64
+# define TEXTUREWIDTH 512
+# define TEXTUREHEIGHT 512
+# define UDIV 1
+# define VDIV 1
+# define VMOVE 0.0
 
 typedef struct s_info
 {
 	int		move_y;
 	int		move_x;
 	int		rotate;
-	double	posX;
-	double	posY;
-	double	dirX;
-	double	dirY;
-	double	planeX;
-	double	planeY;
+	double	pos_x;
+	double	pos_y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
 	double	time;
-	double	oldTime;
-	double	cameraX;
-	double	rayDirX;
-	double	rayDirY;
-	int		mapY;
-	int		mapX;
-	double	sideDistX;
-	double	sideDistY;
-	double	deltaDistX;
-	double	deltaDistY;
-	double	prepWallDist;
-	int		stepX;
-	int		stepY;
+	double	old_time;
+	double	camera_x;
+	double	ray_dir_x;
+	double	ray_dir_y;
+	int		map_y;
+	int		map_x;
+	double	side_dist_x;
+	double	side_dist_y;
+	double	delta_dist_x;
+	double	delta_dist_y;
+	double	prep_wall_dist;
+	int		step_x;
+	int		step_y;
 	int		hit;
 	int		side;
-	int		lineHeight;
-	int		drawStart;
-	int		drawEnd;
+	int		line_height;
+	int		draw_start;
+	int		draw_end;
 	int		color;
 	int		draw;
-	double	frameTime;
-	double	moveSpeed;
-	double	rotSpeed;
-	double	oldDirX;
-	double	oldPlaneX;
-	int		textNum;
-	double	wallX;
-	int		textX;
-	int		textY;
+	double	frame_time;
+	double	move_speed;
+	double	rot_speed;
+	double	old_dir_x;
+	double	old_plane_x;
+	int		text_num;
+	double	wall_x;
+	int		text_x;
+	int		text_y;
 	double	step;
-	double	texPos;
-	float	rayDirX0;
-	float	rayDirY0;
-	float	rayDirX1;
-	float	rayDirY1;
+	double	tex_pos;
+	float	ray_dir_x0;
+	float	ray_dir_y0;
+	float	ray_dir_x1;
+	float	ray_dir_y1;
 	int		p;
-	float	posZ;
-	float	rowDistance;
-	float	floorStepX;
-	float	floorStepY;
-	float	floorX;
-	float	floorY;
-	int		cellX;
-	int		cellY;
+	float	pos_z;
+	float	row_distance;
+	float	floor_step_x;
+	float	floor_step_y;
+	float	floor_x;
+	float	floor_y;
+	int		cell_x;
+	int		cell_y;
 	int		tx;
 	int		ty;
-	int		floorTexture;
-	int		ceilingTexture;
-	double	*Zbuffer;
-	double	spriteX;
-	double	spriteY;
-	double	invDet;
-	double	transformX;
-	double	transformY;
-	int		spriteScreenX;
-	int		spriteHeight;
-	int		spriteWidth;
-	int		drawStartX;
-	int		drawStartY;
-	int		drawEndX;
-	int		drawEndY;
-	int		texX;
+	int		floor_texture;
+	int		ceiling_texture;
+	double	*zbuffer;
+	double	sprite_x;
+	double	sprite_y;
+	double	inv_det;
+	double	transform_x;
+	double	transform_y;
+	int		sprite_screen_x;
+	int		sprite_height;
+	int		sprite_width;
+	int		draw_start_x;
+	int		draw_start_y;
+	int		draw_end_x;
+	int		draw_end_y;
+	int		tex_x;
 	int		d;
-	int		texY;
+	int		tex_y;
 	int		stripe;
 	int		part;
+	int		v_move_screen;
+	double	dx;
+	double	dy;
+	double	t_angle;
+	int		text_n;
 }				t_info;
 
 typedef struct s_image
@@ -133,6 +141,7 @@ typedef struct s_box
 	t_image		*textures;
 	t_sprite	*sprites;
 	int			n_sprites;
+	t_image		*sheva;
 	char		**map;
 	t_info		info;
 	size_t		timer;
