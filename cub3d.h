@@ -6,7 +6,7 @@
 /*   By: antess <antess@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/30 14:00:28 by antess           ###   ########.fr       */
+/*   Updated: 2023/08/06 22:03:20 by antess           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,9 @@ typedef struct s_box
 	t_sprite	*sprites;
 	int			n_sprites;
 	t_image		*sheva;
+	t_image		*meat;
+	t_image		*coin;
+	t_image		*handgun;
 	char		**map;
 	t_info		info;
 	size_t		timer;

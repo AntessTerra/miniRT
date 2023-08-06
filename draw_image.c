@@ -6,7 +6,7 @@
 /*   By: antess <antess@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/07/30 14:07:51 by antess           ###   ########.fr       */
+/*   Updated: 2023/08/06 22:04:30 by antess           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,8 @@ void	redraw(t_box *box)
 			box->info.floor_x += box->info.floor_step_x;
 			box->info.floor_y += box->info.floor_step_y;
 
-			box->info.floor_texture = 3;
-			box->info.ceiling_texture = 6;
+			box->info.floor_texture = 2;
+			box->info.ceiling_texture = 4;
 
 			box->info.color = extract_color(&box->textures[box->info.floor_texture].addr[box->info.tx * 4 + box->textures[box->info.floor_texture].line_len * box->info.ty]);
 			box->info.color = (box->info.color >> 1) & 8355711;
@@ -247,7 +247,14 @@ void	redraw(t_box *box)
 						box->info.text_n = 7;
 					else
 						box->info.text_n = 0;
-					box->info.color = extract_color(&box->sheva[box->info.text_n].addr[box->info.tex_x * 4 + box->sheva[box->info.text_n].line_len * box->info.tex_y]);
+					if (box->sprites[i].texture == 100)
+						box->info.color = extract_color(&box->sheva[box->info.text_n].addr[box->info.tex_x * 4 + box->sheva[box->info.text_n].line_len * box->info.tex_y]);
+					else if (box->sprites[i].texture == 101)
+						box->info.color = extract_color(&box->meat[box->info.text_n].addr[box->info.tex_x * 4 + box->meat[box->info.text_n].line_len * box->info.tex_y]);
+					else if (box->sprites[i].texture == 102)
+						box->info.color = extract_color(&box->coin[(box->timer % 16) / 2].addr[box->info.tex_x * 4 + box->coin[(box->timer % 16) / 2].line_len * box->info.tex_y]);
+					else if (box->sprites[i].texture == 103)
+						box->info.color = extract_color(&box->handgun[(box->timer % 32) / 4].addr[box->info.tex_x * 4 + box->handgun[(box->timer % 32) / 4].line_len * box->info.tex_y]);
 					if ((box->info.color & 0x00FFFFFF) != 0)
 						my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, box->info.color);
 				}
