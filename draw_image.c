@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   draw_image.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antess <antess@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/06 22:04:30 by antess           ###   ########.fr       */
+/*   Updated: 2023/08/07 16:14:30 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,7 +315,12 @@ void	redraw(t_box *box)
 	box->info.old_time = box->info.time;
 	box->info.time = box->timer;
 	box->info.frame_time = (box->info.time - box->info.old_time) / 1000.0;
-	box->info.move_speed = box->info.frame_time * 100.0;
-	box->info.rot_speed = box->info.frame_time * 30.0;
+	box->info.move_speed = box->info.frame_time * 50.0;
+	box->info.rot_speed = box->info.frame_time * 20.0;
+	if (box->info.sprint)
+	{
+		box->info.move_speed *= 2;
+		box->info.rot_speed *= 1.5;
+	}
 	mlx_put_image_to_window(box->mlx, box->win, box->image.img, 0, 0);
 }
