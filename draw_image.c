@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 15:00:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/07 16:14:30 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/15 17:32:36 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,8 +253,10 @@ void	redraw(t_box *box)
 						box->info.color = extract_color(&box->meat[box->info.text_n].addr[box->info.tex_x * 4 + box->meat[box->info.text_n].line_len * box->info.tex_y]);
 					else if (box->sprites[i].texture == 102)
 						box->info.color = extract_color(&box->coin[(box->timer % 16) / 2].addr[box->info.tex_x * 4 + box->coin[(box->timer % 16) / 2].line_len * box->info.tex_y]);
-					else if (box->sprites[i].texture == 103)
+					else if (box->sprites[i].texture == 103 && !box->player.has_gun)
 						box->info.color = extract_color(&box->handgun[(box->timer % 32) / 4].addr[box->info.tex_x * 4 + box->handgun[(box->timer % 32) / 4].line_len * box->info.tex_y]);
+					else
+						box->info.color = 0;
 					if ((box->info.color & 0x00FFFFFF) != 0)
 						my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, box->info.color);
 				}
@@ -312,15 +314,80 @@ void	redraw(t_box *box)
 			box->info.pos_y += box->info.dir_x * box->info.move_speed;
 	}
 
-	box->info.old_time = box->info.time;
-	box->info.time = box->timer;
-	box->info.frame_time = (box->info.time - box->info.old_time) / 1000.0;
-	box->info.move_speed = box->info.frame_time * 50.0;
-	box->info.rot_speed = box->info.frame_time * 20.0;
+	box->old_time = box->time;
+	gettimeofday(&box->time, NULL);
+	box->info.frame_time = (box->time.tv_sec - box->old_time.tv_sec) +
+						((box->time.tv_usec - box->old_time.tv_usec)/1000000.0);
+	box->info.move_speed = box->info.frame_time * 3.0;
+	box->info.rot_speed = box->info.frame_time * 1.5;
 	if (box->info.sprint)
 	{
 		box->info.move_speed *= 2;
 		box->info.rot_speed *= 1.5;
 	}
+
+	//HEALTH BAR
+	if (box->player.h_state == 0)
+		box->player.h_offset = 0;
+	else if (box->player.h_state == 1)
+		box->player.h_offset = 80;
+	else if (box->player.h_state == 2)
+		box->player.h_offset = 160;
+	else if (box->player.h_state == 3)
+		box->player.h_offset = 240;
+	x = -1;
+	while (++x < 80)
+	{
+		y = SCREENHEIGHT - 40;
+		while (++y < SCREENHEIGHT)
+		{
+			if (x < (int)box->timer % 120 && x > (int)box->timer % 120 - 40)
+				my_mlx_pyxel_put(&box->image, x, y, extract_color(&box->player.h_bar.addr[(x + box->player.h_offset) * 4 + box->player.h_bar.line_len * (y - (SCREENHEIGHT - 40))]));
+			else
+				my_mlx_pyxel_put(&box->image, x, y, extract_color(&box->player.h_bar.addr[1 * 4 + box->player.h_bar.line_len * (y - (SCREENHEIGHT - 40) + 48)]));
+		}
+	}
+
+	//GUN
+	if ((box->info.pos_x > 3.9 && box->info.pos_x < 4.1) && (box->info.pos_y > 3.9 && box->info.pos_y < 4.1))
+		box->player.has_gun = 1;
+	if (box->player.has_gun > 0)
+	{
+		x = -1;
+		while (++x < SCREENWIDTH)
+		{
+			y = -1;
+			while (++y < SCREENHEIGHT)
+			{
+				if (box->player.has_gun == 1)
+				{
+					box->info.color = extract_color(&box->player.gun_overlay.addr[x * 4 + box->player.gun_overlay.line_len * y]);
+					if ((box->info.color & 0x00FFFFFF) != 0)
+						my_mlx_pyxel_put(&box->image, x, y, box->info.color);
+				}
+				if (x >= 80 && x < 160 && y >= 640)
+				{
+					box->info.color = extract_color(&box->player.gun_hotbar.addr[(x - 80) * 4 + box->player.gun_hotbar.line_len * (y - 640)]);
+					if ((box->info.color & 0x00FFFFFF) != 0)
+						my_mlx_pyxel_put(&box->image, x, y, box->info.color);
+				}
+			}
+		}
+	}
+
 	mlx_put_image_to_window(box->mlx, box->win, box->image.img, 0, 0);
+	mlx_string_put(box->mlx, box->win, 20, 20, 0x00FFFFFF, ft_itoa(1.0 / box->info.frame_time));
+	if (box->player.h_state == 0)
+		mlx_string_put(box->mlx, box->win, 15, 670, 0x0000FF00, "Fine");
+	else if (box->player.h_state == 1)
+		mlx_string_put(box->mlx, box->win, 15, 670, 0x00FF8700, "Caution");
+	else if (box->player.h_state == 2)
+		mlx_string_put(box->mlx, box->win, 15, 670, 0x00FF0000, "Danger");
+	else if (box->player.h_state == 3)
+		mlx_string_put(box->mlx, box->win, 15, 670, 0x009F00F5, "Poison");
+	if (box->player.has_gun > 0)
+	{
+		mlx_string_put(box->mlx, box->win, 120, 620, 0x00FFFFFF, "1");
+		mlx_string_put(box->mlx, box->win, 110, 640, 0x00FFFFFF, "M92G");
+	}
 }

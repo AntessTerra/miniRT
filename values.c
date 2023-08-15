@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   values.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antess <antess@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 16:15:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/06 22:03:06 by antess           ###   ########.fr       */
+/*   Updated: 2023/08/15 17:25:48 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,17 @@ void	init_textures(t_box *box)
 	box->handgun[7].img = mlx_xpm_file_to_image(box->mlx, "textures/handgun/0007.xpm", &k, &j);
 	box->handgun[7].addr = (unsigned char *)mlx_get_data_addr(box->handgun[7].img,
 			&box->handgun[7].bits_pp, &box->handgun[7].line_len, &box->handgun[7].endian);
+
+	box->player.h_bar.img = mlx_xpm_file_to_image(box->mlx, "textures/health_bar.xpm", &k, &j);
+	box->player.h_bar.addr = (unsigned char *)mlx_get_data_addr(box->player.h_bar.img,
+			&box->player.h_bar.bits_pp, &box->player.h_bar.line_len, &box->player.h_bar.endian);
+
+	box->player.gun_overlay.img = mlx_xpm_file_to_image(box->mlx, "textures/gun_overlay.xpm", &k, &j);
+	box->player.gun_overlay.addr = (unsigned char *)mlx_get_data_addr(box->player.gun_overlay.img,
+			&box->player.gun_overlay.bits_pp, &box->player.gun_overlay.line_len, &box->player.gun_overlay.endian);
+	box->player.gun_hotbar.img = mlx_xpm_file_to_image(box->mlx, "textures/gun_hotbar.xpm", &k, &j);
+	box->player.gun_hotbar.addr = (unsigned char *)mlx_get_data_addr(box->player.gun_hotbar.img,
+			&box->player.gun_hotbar.bits_pp, &box->player.gun_hotbar.line_len, &box->player.gun_hotbar.endian);
 }
 
 /*	Init_vals
@@ -168,13 +179,13 @@ void	init_textures(t_box *box)
 void	init_vals(t_box *box)
 {
 	box->info.pos_x = 4;
-	box->info.pos_y = 4;
+	box->info.pos_y = 5;
 	box->info.dir_x = -1.0;
 	box->info.dir_y = 0;
 	box->info.plane_x = 0;
 	box->info.plane_y = 0.66;
-	box->info.time = 0;
-	box->info.old_time = 0;
+	gettimeofday(&box->time, NULL);
+	gettimeofday(&box->old_time, NULL);
 	box->info.camera_x = 0;
 	box->info.ray_dir_x = 0;
 	box->info.ray_dir_y = 0;
@@ -182,10 +193,13 @@ void	init_vals(t_box *box)
 	box->info.move_x = 0;
 	box->info.move_y = 0;
 	box->info.hit = 0;
+	box->info.sprint = 0;
 	box->timer = 0;
 	box->info.old_dir_x = 0;
 	box->info.old_plane_x = 0;
 	box->info.zbuffer = malloc(SCREENWIDTH * sizeof(double));
+	box->player.h_state = 0;
+	box->player.has_gun = 0;
 }
 
 void	reset_vals(t_box *box)

@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/07 16:11:08 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/15 17:25:25 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <math.h>
+# include <sys/time.h>
 # include "Libft/libft.h"
 # include "minilibx/mlx.h"
 
@@ -43,8 +44,6 @@ typedef struct s_info
 	double	dir_y;
 	double	plane_x;
 	double	plane_y;
-	double	time;
-	double	old_time;
 	double	camera_x;
 	double	ray_dir_x;
 	double	ray_dir_y;
@@ -134,21 +133,34 @@ typedef struct s_sprite
 	double	dist;
 }				t_sprite;
 
+typedef struct s_player
+{
+	t_image		h_bar;
+	int			h_state;
+	int			h_offset;
+	t_image		gun_overlay;
+	t_image		gun_hotbar;
+	int			has_gun;
+}				t_player;
+
 typedef struct s_box
 {
-	void		*mlx;
-	void		*win;
-	t_image		image;
-	t_image		*textures;
-	t_sprite	*sprites;
-	int			n_sprites;
-	t_image		*sheva;
-	t_image		*meat;
-	t_image		*coin;
-	t_image		*handgun;
-	char		**map;
-	t_info		info;
-	size_t		timer;
+	void			*mlx;
+	void			*win;
+	t_image			image;
+	t_image			*textures;
+	t_sprite		*sprites;
+	int				n_sprites;
+	t_image			*sheva;
+	t_image			*meat;
+	t_image			*coin;
+	t_image			*handgun;
+	char			**map;
+	t_info			info;
+	size_t			timer;
+	struct timeval	time;
+	struct timeval	old_time;
+	t_player		player;
 }				t_box;
 
 int		exit_hook(t_box *box);
