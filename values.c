@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 16:15:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/15 17:25:48 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/25 16:58:55 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,8 @@ void	init_textures(t_box *box)
 			&box->handgun[7].bits_pp, &box->handgun[7].line_len, &box->handgun[7].endian);
 
 	box->player.h_bar.img = mlx_xpm_file_to_image(box->mlx, "textures/health_bar.xpm", &k, &j);
+	if (!box->player.h_bar.img)
+		box->player.h_bar.img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
 	box->player.h_bar.addr = (unsigned char *)mlx_get_data_addr(box->player.h_bar.img,
 			&box->player.h_bar.bits_pp, &box->player.h_bar.line_len, &box->player.h_bar.endian);
 

@@ -6,7 +6,7 @@
 #    By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/10 16:55:23 by jbartosi          #+#    #+#              #
-#    Updated: 2023/07/27 16:15:51 by jbartosi         ###   ########.fr        #
+#    Updated: 2023/08/24 14:16:56 by jbartosi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CFLAGS = -Wall -Wextra -Werror
 LIBFT = Libft
 MLX = minilibx
 
-SRC = main.c hook.c parser.c draw_image.c values.c
+SRC = main.c hook.c parser.c draw_image.c values.c casting.c
 OBJ = $(SRC:.c=.o)
 
 all: lib $(NAME)
@@ -26,7 +26,7 @@ lib:
 	@echo "Finished making libraries :D"
 
 $(NAME): $(OBJ)
-	cc $(CFLAGS) -g -L $(LIBFT) -L $(MLX) -o $@ $^ -lft -lmlx -lXext -lX11 -lm
+	@cc $(CFLAGS) -g -L $(LIBFT) -L $(MLX) -o $@ $^ -lft -lmlx -lXext -lX11 -lm
 
 clean:
 	@make clean -C $(LIBFT)

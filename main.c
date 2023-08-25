@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/15 14:43:33 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/25 17:54:08 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ void	check(t_box *box, int argc, char **argv)
 	fd = open(argv[1], O_RDONLY);
 	if (!fd)
 		return (printf("Error\nCannot open file.\n"), exit(1));
-	parser(box, fd);
 	init_vals(box);
+	parser(box, fd);
 	box->n_sprites = count_sprites(box);
 	close(fd);
 }
@@ -60,7 +60,41 @@ int	timer(t_box *box)
 
 int	main(int argc, char **argv)
 {
-	t_box	box;
+	t_box			box;
+	struct dirent	*dir;
+	struct dirent	*subdir;
+	DIR				*pdir;
+	DIR				*psubdir;
+	char			*tmp;
+
+	pdir = opendir("textures");
+	if (!pdir)
+		return (printf("Cannot open directory textures\n"), 1);
+	dir = readdir(pdir);
+	while (dir)
+	{
+		if (ft_strchr(dir->d_name, '.') && dir->d_name[0] != '.')
+			printf("Im a file [%s]\n", dir->d_name);
+		else if (dir->d_name[0] != '.')
+		{
+			printf("Im a folder [%s]\n", dir->d_name);
+			tmp = ft_strjoin("textures/", dir->d_name);
+			psubdir = opendir(tmp);
+			free(tmp);
+			if (!psubdir)
+				return (printf("Cannot open directory %s\n", dir->d_name), 1);
+			subdir = readdir(psubdir);
+			while (subdir)
+			{
+				if (ft_strchr(subdir->d_name, '.') && subdir->d_name[0] != '.')
+					printf("Im a file [%s/%s]\n", dir->d_name, subdir->d_name);
+				subdir = readdir(psubdir);
+			}
+			closedir(psubdir);
+		}
+		dir = readdir(pdir);
+	}
+	closedir(pdir);
 
 	check(&box, argc, argv);
 	box.mlx = mlx_init();
