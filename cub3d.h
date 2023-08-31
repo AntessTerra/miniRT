@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/25 17:42:44 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/31 14:09:31 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,14 @@
 # define UDIV 1
 # define VDIV 1
 # define VMOVE 0.0
+# define ANGLE0 "0000.xpm"
+# define ANGLE1 "0001.xpm"
+# define ANGLE2 "0002.xpm"
+# define ANGLE3 "0003.xpm"
+# define ANGLE4 "0004.xpm"
+# define ANGLE5 "0005.xpm"
+# define ANGLE6 "0006.xpm"
+# define ANGLE7 "0007.xpm"
 
 typedef struct s_info
 {

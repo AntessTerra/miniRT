@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:50:14 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/25 17:54:08 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/08/29 14:30:08 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,7 @@ int	timer(t_box *box)
 	return (0);
 }
 
-int	main(int argc, char **argv)
-{
-	t_box			box;
+/*
 	struct dirent	*dir;
 	struct dirent	*subdir;
 	DIR				*pdir;
@@ -95,6 +93,11 @@ int	main(int argc, char **argv)
 		dir = readdir(pdir);
 	}
 	closedir(pdir);
+*/
+
+int	main(int argc, char **argv)
+{
+	t_box			box;
 
 	check(&box, argc, argv);
 	box.mlx = mlx_init();
