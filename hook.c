@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 18:52:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/15 17:34:13 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/06 13:54:59 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,23 +58,6 @@ int	key_release(int key, t_box *box)
 		box->info.move_y = 0;
 	if (key == 100 || key == 65363)
 		box->info.move_y = 0;
-	if (key == 65505)
-		box->info.sprint = 0;
-	if (key == 65438)
-		box->player.h_state = 0;
-	if (key == 65436)
-		box->player.h_state = 1;
-	if (key == 65433)
-		box->player.h_state = 2;
-	if (key == 65435)
-		box->player.h_state = 3;
-	if (key == 49)
-	{
-		if (box->player.has_gun == 1)
-			box->player.has_gun = 2;
-		else
-			box->player.has_gun = 1;
-	}
 	//printf("Key released: %i\n", key);
 	return (0);
 }

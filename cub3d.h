@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/15 17:25:25 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 16:21:48 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,14 @@
 # include <fcntl.h>
 # include <math.h>
 # include <sys/time.h>
+# include <dirent.h>
 # include "Libft/libft.h"
 # include "minilibx/mlx.h"
 
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
-# define TEXTUREWIDTH 512
-# define TEXTUREHEIGHT 512
+# define TEXTUREWIDTH 64
+# define TEXTUREHEIGHT 64
 # define UDIV 1
 # define VDIV 1
 # define VMOVE 0.0
@@ -123,6 +124,7 @@ typedef struct s_image
 	int				bits_pp;
 	int				line_len;
 	int				endian;
+	char			*name;
 }				t_image;
 
 typedef struct s_sprite
@@ -133,16 +135,6 @@ typedef struct s_sprite
 	double	dist;
 }				t_sprite;
 
-typedef struct s_player
-{
-	t_image		h_bar;
-	int			h_state;
-	int			h_offset;
-	t_image		gun_overlay;
-	t_image		gun_hotbar;
-	int			has_gun;
-}				t_player;
-
 typedef struct s_box
 {
 	void			*mlx;
@@ -151,26 +143,37 @@ typedef struct s_box
 	t_image			*textures;
 	t_sprite		*sprites;
 	int				n_sprites;
-	t_image			*sheva;
-	t_image			*meat;
-	t_image			*coin;
-	t_image			*handgun;
 	char			**map;
+	int				map_width;
 	t_info			info;
 	size_t			timer;
 	struct timeval	time;
 	struct timeval	old_time;
-	t_player		player;
 }				t_box;
 
+//Hook.c
 int		exit_hook(t_box *box);
 int		key_press(int key, t_box *box);
 int		key_release(int key, t_box *box);
+
+//Parser.c
 void	parser(t_box *box, int fd);
-void	redraw(t_box *box);
+
+//Values.c
 void	init_vals(t_box *box);
 void	init_textures(t_box *box);
 void	reset_vals(t_box *box);
 void	bubble_sort_sprites(t_box *box);
+
+//Draw_image.c
+void	redraw(t_box *box);
+int		extract_color(unsigned char *pixel);
+void	my_mlx_pyxel_put(t_image *image, int x, int y, int color);
+void	cal_move(t_box *box);
+
+//Casting.c
+void	cast_floor(t_box *box);
+void	cast_wall(t_box *box);
+void	cast_obj(t_box *box);
 
 #endif
