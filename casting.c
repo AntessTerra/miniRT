@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:04:56 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/09/11 17:38:19 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 19:11:49 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ void	cast_obj(t_box *box)
 						box->info.text_n = 0;
 					if (box->sprites[i].texture == 10)
 					{
-						if (box->info.tex_y < 47 && box->info.tex_y >= 16)
+						if (box->info.tex_y < 47 && box->info.tex_y > 15)
 						{
 							if (box->sprites[i].dist < 2)
 								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[(box->info.tex_x * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 16]);
@@ -245,19 +245,33 @@ void	cast_obj(t_box *box)
 					}
 					else if (box->sprites[i].texture == 11)
 					{
-						if (box->info.tex_x < 32)
-							box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y]);
+						if (box->info.tex_x < 48 && box->info.tex_x > 15)
+							box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 40) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y]);
 						else
 							box->info.color = 0;
 					}
 					else if (box->sprites[i].texture == 12)
 					{
-						if (box->info.tex_x < 47 && box->info.tex_x >= 16 && box->info.tex_y < 47 && box->info.tex_y >= 16)
+						if (box->info.tex_x < 48 && box->info.tex_x > 15 && box->info.tex_y < 47 && box->info.tex_y > 15)
 						{
 							if (box->sprites[i].dist < 2)
 								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 16]);
+							else if (box->sprites[i].dist > 5)
+								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 48]);
 							else
 								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * -16]);
+						}
+						else
+							box->info.color = 0;
+					}
+					else if (box->sprites[i].texture == 20)
+					{
+						if (box->info.tex_x < 56 && box->info.tex_x > 20 && box->info.tex_y < 60 && box->info.tex_y > 12)
+						{
+							box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x - 16 + 32 * ((int)(box->timer % 80) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 42]);
+							if ((box->info.color & 0x00FFFFFF) != 0)
+								my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, box->info.color);
+							box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x - 16) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 8]);
 						}
 						else
 							box->info.color = 0;

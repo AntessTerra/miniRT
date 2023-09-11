@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 16:15:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/09/11 17:28:08 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 18:56:29 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,16 @@ void	init_textures(t_box *box)
 	int		i;
 
 	box->textures = malloc(50 * sizeof(t_image));
+	i = -1;
+	while (++i < 50)
+		box->textures[i].img = 0;
 	box->textures[0].img = mlx_xpm_file_to_image(box->mlx, "textures/wall.xpm", &k, &j);
 	box->textures[1].img = mlx_xpm_file_to_image(box->mlx, "textures/floor.xpm", &k, &j);
 	box->textures[2].img = mlx_xpm_file_to_image(box->mlx, "textures/wall.xpm", &k, &j);
 	box->textures[10].img = mlx_xpm_file_to_image(box->mlx, "textures/baby.xpm", &k, &j);
 	box->textures[11].img = mlx_xpm_file_to_image(box->mlx, "textures/nerve_ending.xpm", &k, &j);
 	box->textures[12].img = mlx_xpm_file_to_image(box->mlx, "textures/leech.xpm", &k, &j);
+	box->textures[20].img = mlx_xpm_file_to_image(box->mlx, "textures/isaac.xpm", &k, &j);
 	i = -1;
 	while (++i < 50)
 	{
