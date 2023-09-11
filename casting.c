@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:04:56 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/24 14:32:47 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 17:38:19 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void	cast_floor(t_box *box)
 			box->info.floor_x += box->info.floor_step_x;
 			box->info.floor_y += box->info.floor_step_y;
 
-			box->info.floor_texture = 2;
-			box->info.ceiling_texture = 4;
+			box->info.floor_texture = 1;
+			box->info.ceiling_texture = 1;
 
 			box->info.color = extract_color(&box->textures[box->info.floor_texture].addr[box->info.tx * 4 + box->textures[box->info.floor_texture].line_len * box->info.ty]);
 			box->info.color = (box->info.color >> 1) & 8355711;
@@ -201,11 +201,9 @@ void	cast_obj(t_box *box)
 		//printf("Angle: %f | %f %f %f - %f %f - %f\n", angle, dx, dy, box->sprites[i].x, box->info.pos_x, box->sprites[i].y, box->info.pos_y);
 
 		box->info.stripe = box->info.draw_start_x;
-
 		while (box->info.stripe < box->info.draw_end_x)
 		{
 			box->info.tex_x = (int)(256 * (box->info.stripe - (-box->info.sprite_width / 2 + box->info.sprite_screen_x)) * TEXTUREWIDTH / box->info.sprite_width) / 256;
-
 			if (box->info.transform_y > 0 && box->info.transform_y < box->info.zbuffer[box->info.stripe])
 			{
 				//printf("Sprite n: %i // %f > 0 | %d > 0 | %d < %d | %f < %f\n", i, box->info.transform_y, box->info.stripe, box->info.stripe, SCREENWIDTH, box->info.transform_y, box->info.zbuffer[box->info.stripe]);
@@ -233,16 +231,39 @@ void	cast_obj(t_box *box)
 						box->info.text_n = 7;
 					else
 						box->info.text_n = 0;
-					if (box->sprites[i].texture == 100)
-						box->info.color = extract_color(&box->sheva[box->info.text_n].addr[box->info.tex_x * 4 + box->sheva[box->info.text_n].line_len * box->info.tex_y]);
-					else if (box->sprites[i].texture == 101)
-						box->info.color = extract_color(&box->meat[box->info.text_n].addr[box->info.tex_x * 4 + box->meat[box->info.text_n].line_len * box->info.tex_y]);
-					else if (box->sprites[i].texture == 102)
-						box->info.color = extract_color(&box->coin[(box->timer % 16) / 2].addr[box->info.tex_x * 4 + box->coin[(box->timer % 16) / 2].line_len * box->info.tex_y]);
-					else if (box->sprites[i].texture == 103 && !box->player.has_gun)
-						box->info.color = extract_color(&box->handgun[(box->timer % 32) / 4].addr[box->info.tex_x * 4 + box->handgun[(box->timer % 32) / 4].line_len * box->info.tex_y]);
+					if (box->sprites[i].texture == 10)
+					{
+						if (box->info.tex_y < 47 && box->info.tex_y >= 16)
+						{
+							if (box->sprites[i].dist < 2)
+								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[(box->info.tex_x * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 16]);
+							else
+								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[(box->info.tex_x * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * -16]);
+						}
+						else
+							box->info.color = 0;
+					}
+					else if (box->sprites[i].texture == 11)
+					{
+						if (box->info.tex_x < 32)
+							box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y]);
+						else
+							box->info.color = 0;
+					}
+					else if (box->sprites[i].texture == 12)
+					{
+						if (box->info.tex_x < 47 && box->info.tex_x >= 16 && box->info.tex_y < 47 && box->info.tex_y >= 16)
+						{
+							if (box->sprites[i].dist < 2)
+								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * 16]);
+							else
+								box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[((box->info.tex_x + 16 + 32 * ((int)(box->timer % 48) / 8)) * 4) + box->textures[box->sprites[i].texture].line_len * box->info.tex_y + box->textures[box->sprites[i].texture].line_len * -16]);
+						}
+						else
+							box->info.color = 0;
+					}
 					else
-						box->info.color = 0;
+						box->info.color = extract_color(&box->textures[box->sprites[i].texture].addr[box->info.tex_x * 4 + box->textures[box->sprites[i].texture].line_len * box->info.tex_y]);
 					if ((box->info.color & 0x00FFFFFF) != 0)
 						my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, box->info.color);
 					box->info.part++;

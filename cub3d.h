@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/31 14:09:31 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 16:21:48 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,19 +27,11 @@
 
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
-# define TEXTUREWIDTH 512
-# define TEXTUREHEIGHT 512
+# define TEXTUREWIDTH 64
+# define TEXTUREHEIGHT 64
 # define UDIV 1
 # define VDIV 1
 # define VMOVE 0.0
-# define ANGLE0 "0000.xpm"
-# define ANGLE1 "0001.xpm"
-# define ANGLE2 "0002.xpm"
-# define ANGLE3 "0003.xpm"
-# define ANGLE4 "0004.xpm"
-# define ANGLE5 "0005.xpm"
-# define ANGLE6 "0006.xpm"
-# define ANGLE7 "0007.xpm"
 
 typedef struct s_info
 {
@@ -143,16 +135,6 @@ typedef struct s_sprite
 	double	dist;
 }				t_sprite;
 
-typedef struct s_player
-{
-	t_image		h_bar;
-	int			h_state;
-	int			h_offset;
-	t_image		gun_overlay;
-	t_image		gun_hotbar;
-	int			has_gun;
-}				t_player;
-
 typedef struct s_box
 {
 	void			*mlx;
@@ -161,17 +143,12 @@ typedef struct s_box
 	t_image			*textures;
 	t_sprite		*sprites;
 	int				n_sprites;
-	t_image			*sheva;
-	t_image			*meat;
-	t_image			*coin;
-	t_image			*handgun;
 	char			**map;
 	int				map_width;
 	t_info			info;
 	size_t			timer;
 	struct timeval	time;
 	struct timeval	old_time;
-	t_player		player;
 }				t_box;
 
 //Hook.c

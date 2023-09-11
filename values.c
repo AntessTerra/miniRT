@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 16:15:23 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/08/31 14:11:33 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/11 17:28:08 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,100 +21,22 @@ void	init_textures(t_box *box)
 	int		k;
 	int		j;
 	int		i;
-	char	*path;
-	char	*angle[8];
 
-	angle[0] = ANGLE0;
-	angle[1] = ANGLE1;
-	angle[2] = ANGLE2;
-	angle[3] = ANGLE3;
-	angle[4] = ANGLE4;
-	angle[5] = ANGLE5;
-	angle[6] = ANGLE6;
-	angle[7] = ANGLE7;
-
-	box->textures = malloc(11 * sizeof(t_image));
-	box->textures[0].img = mlx_xpm_file_to_image(box->mlx, "textures/brick.xpm", &k, &j);
-	box->textures[0].addr = (unsigned char *)mlx_get_data_addr(box->textures[0].img,
-			&box->textures[0].bits_pp, &box->textures[0].line_len, &box->textures[0].endian);
-	box->textures[1].img = mlx_xpm_file_to_image(box->mlx, "textures/wood_mixed.xpm", &k, &j);
-	box->textures[1].addr = (unsigned char *)mlx_get_data_addr(box->textures[1].img,
-			&box->textures[1].bits_pp, &box->textures[1].line_len, &box->textures[1].endian);
-	box->textures[2].img = mlx_xpm_file_to_image(box->mlx, "textures/red_terracotta_floor.xpm", &k, &j);
-	box->textures[2].addr = (unsigned char *)mlx_get_data_addr(box->textures[2].img,
-			&box->textures[2].bits_pp, &box->textures[2].line_len, &box->textures[2].endian);
-	box->textures[3].img = mlx_xpm_file_to_image(box->mlx, "textures/brick.xpm", &k, &j);
-	box->textures[3].addr = (unsigned char *)mlx_get_data_addr(box->textures[3].img,
-			&box->textures[3].bits_pp, &box->textures[3].line_len, &box->textures[3].endian);
-	box->textures[4].img = mlx_xpm_file_to_image(box->mlx, "textures/white_concrete.xpm", &k, &j);
-	box->textures[4].addr = (unsigned char *)mlx_get_data_addr(box->textures[4].img,
-			&box->textures[4].bits_pp, &box->textures[4].line_len, &box->textures[4].endian);
-
-	box->sheva = malloc(8 * sizeof(t_image));
+	box->textures = malloc(50 * sizeof(t_image));
+	box->textures[0].img = mlx_xpm_file_to_image(box->mlx, "textures/wall.xpm", &k, &j);
+	box->textures[1].img = mlx_xpm_file_to_image(box->mlx, "textures/floor.xpm", &k, &j);
+	box->textures[2].img = mlx_xpm_file_to_image(box->mlx, "textures/wall.xpm", &k, &j);
+	box->textures[10].img = mlx_xpm_file_to_image(box->mlx, "textures/baby.xpm", &k, &j);
+	box->textures[11].img = mlx_xpm_file_to_image(box->mlx, "textures/nerve_ending.xpm", &k, &j);
+	box->textures[12].img = mlx_xpm_file_to_image(box->mlx, "textures/leech.xpm", &k, &j);
 	i = -1;
-	while (++i < 8)
+	while (++i < 50)
 	{
-		path = ft_strjoin("textures/sheva/", angle[i]);
-		box->sheva[i].img = mlx_xpm_file_to_image(box->mlx, path, &k, &j);
-		if (!box->sheva[i].img)
-			box->sheva[i].img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
-		box->sheva[i].addr = (unsigned char *)mlx_get_data_addr(box->sheva[i].img,
-				&box->sheva[i].bits_pp, &box->sheva[i].line_len, &box->sheva[i].endian);
-		free(path);
+		if (!box->textures[i].img)
+			box->textures[i].img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
+		box->textures[i].addr = (unsigned char *)mlx_get_data_addr(box->textures[i].img,
+			&box->textures[i].bits_pp, &box->textures[i].line_len, &box->textures[i].endian);
 	}
-
-
-	box->meat = malloc(8 * sizeof(t_image));
-	i = -1;
-	while (++i < 8)
-	{
-		path = ft_strjoin("textures/meat/", angle[i]);
-		box->meat[i].img = mlx_xpm_file_to_image(box->mlx, path, &k, &j);
-		if (!box->meat[i].img)
-			box->meat[i].img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
-		box->meat[i].addr = (unsigned char *)mlx_get_data_addr(box->meat[i].img,
-				&box->meat[i].bits_pp, &box->meat[i].line_len, &box->meat[i].endian);
-		free(path);
-	}
-
-	box->coin = malloc(8 * sizeof(t_image));
-	i = -1;
-	while (++i < 8)
-	{
-		path = ft_strjoin("textures/coin/", angle[i]);
-		box->coin[i].img = mlx_xpm_file_to_image(box->mlx, path, &k, &j);
-		if (!box->coin[i].img)
-			box->coin[i].img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
-		box->coin[i].addr = (unsigned char *)mlx_get_data_addr(box->coin[i].img,
-				&box->coin[i].bits_pp, &box->coin[i].line_len, &box->coin[i].endian);
-		free(path);
-	}
-
-	box->handgun = malloc(8 * sizeof(t_image));
-	i = -1;
-	while (++i < 8)
-	{
-		path = ft_strjoin("textures/handgun/", angle[i]);
-		box->handgun[i].img = mlx_xpm_file_to_image(box->mlx, path, &k, &j);
-		if (!box->handgun[i].img)
-			box->handgun[i].img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
-		box->handgun[i].addr = (unsigned char *)mlx_get_data_addr(box->handgun[i].img,
-				&box->handgun[i].bits_pp, &box->handgun[i].line_len, &box->handgun[i].endian);
-		free(path);
-	}
-
-	box->player.h_bar.img = mlx_xpm_file_to_image(box->mlx, "textures/health_bar.xpm", &k, &j);
-	if (!box->player.h_bar.img)
-		box->player.h_bar.img = mlx_xpm_file_to_image(box->mlx, "textures/missing.xpm", &k, &j);
-	box->player.h_bar.addr = (unsigned char *)mlx_get_data_addr(box->player.h_bar.img,
-			&box->player.h_bar.bits_pp, &box->player.h_bar.line_len, &box->player.h_bar.endian);
-
-	box->player.gun_overlay.img = mlx_xpm_file_to_image(box->mlx, "textures/gun_overlay.xpm", &k, &j);
-	box->player.gun_overlay.addr = (unsigned char *)mlx_get_data_addr(box->player.gun_overlay.img,
-			&box->player.gun_overlay.bits_pp, &box->player.gun_overlay.line_len, &box->player.gun_overlay.endian);
-	box->player.gun_hotbar.img = mlx_xpm_file_to_image(box->mlx, "textures/gun_hotbar.xpm", &k, &j);
-	box->player.gun_hotbar.addr = (unsigned char *)mlx_get_data_addr(box->player.gun_hotbar.img,
-			&box->player.gun_hotbar.bits_pp, &box->player.gun_hotbar.line_len, &box->player.gun_hotbar.endian);
 }
 
 /*	Init_vals
@@ -143,8 +65,6 @@ void	init_vals(t_box *box)
 	box->info.old_dir_x = 0;
 	box->info.old_plane_x = 0;
 	box->info.zbuffer = malloc(SCREENWIDTH * sizeof(double));
-	box->player.h_state = 0;
-	box->player.has_gun = 0;
 }
 
 void	reset_vals(t_box *box)
