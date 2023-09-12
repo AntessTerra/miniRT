@@ -6,7 +6,7 @@
 #    By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/10 16:55:23 by jbartosi          #+#    #+#              #
-#    Updated: 2023/08/24 14:16:56 by jbartosi         ###   ########.fr        #
+#    Updated: 2023/09/12 14:28:40 by jbartosi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CFLAGS = -Wall -Wextra -Werror
 LIBFT = Libft
 MLX = minilibx
 
-SRC = main.c hook.c parser.c draw_image.c values.c casting.c
+SRC = main.c hook.c parser.c draw_image.c values.c casting.c movement.c
 OBJ = $(SRC:.c=.o)
 
 all: lib $(NAME)

@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 16:51:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/09/11 16:21:48 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/12 14:24:39 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,5 +175,8 @@ void	cal_move(t_box *box);
 void	cast_floor(t_box *box);
 void	cast_wall(t_box *box);
 void	cast_obj(t_box *box);
+
+//Movement.c
+void	cal_ene_move(t_box *box);
 
 #endif

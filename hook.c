@@ -6,7 +6,7 @@
 /*   By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 18:52:55 by jbartosi          #+#    #+#             */
-/*   Updated: 2023/09/06 13:54:59 by jbartosi         ###   ########.fr       */
+/*   Updated: 2023/09/12 13:23:05 by jbartosi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@ int	key_release(int key, t_box *box)
 		box->info.move_y = 0;
 	if (key == 100 || key == 65363)
 		box->info.move_y = 0;
+	if (key == 65505)
+		box->info.sprint = 0;
 	//printf("Key released: %i\n", key);
 	return (0);
 }
