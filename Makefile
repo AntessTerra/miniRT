@@ -1,41 +1,29 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: jbartosi <jbartosi@student.42prague.com    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/06/10 16:55:23 by jbartosi          #+#    #+#              #
-#    Updated: 2023/08/24 14:16:56 by jbartosi         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME =	doom-nukem
+CPPFLAGS = -Wall -Wextra -Werror -g
 
-NAME = cub3d
-CFLAGS = -Wall -Wextra -Werror
-LIBFT = Libft
-MLX = minilibx
+MLX_FLAGS = MacroLibX/libmlx.so -lXext -lXrender -lX11 -lm -lSDL2 -pthread
+CPPFLAGS += -fPIE
 
-SRC = main.c hook.c parser.c draw_image.c values.c casting.c
-OBJ = $(SRC:.c=.o)
+MLX = MacroLibX
+CUTE_PNG = cute_png
+CUTE_SOUND = cute_sound
+
+SRC = main.cpp Minilibx.cpp Image.cpp
 
 all: lib $(NAME)
 
 lib:
-	@make -C $(LIBFT)
 	@make -C $(MLX)
-	@echo "Finished making libraries :D"
+	@make -C $(CUTE_PNG)
+	@make -C $(CUTE_SOUND)
 
-$(NAME): $(OBJ)
-	@cc $(CFLAGS) -g -L $(LIBFT) -L $(MLX) -o $@ $^ -lft -lmlx -lXext -lX11 -lm
+$(NAME): $(SRC)
+	c++ $(CPPFLAGS) -o $@ $^ -L $(MLX) $(MLX_FLAGS) cute_png/cute_png.o cute_sound/cute_sound.o
 
 clean:
-	@make clean -C $(LIBFT)
-	@rm -f $(OBJ)
 
 fclean:
-	@rm -f $(OBJ)
 	@rm -f $(NAME)
-	@make fclean -C $(LIBFT)
 
 re:	fclean
 	@make all
