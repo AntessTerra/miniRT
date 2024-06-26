@@ -200,30 +200,6 @@ int	key_press(int key, t_box *box)
 		box->start_menu = 1;
 	}
 
-	//IDDQD for god mode
-	if (key >= 'a' && key <= 'z')  // Assuming ASCII values
-	{
-		// Assign the character to the buffer
-		box->input_buffer[box->input_index] = (char)key;
-		box->input_index++;
-		box->input_buffer[box->input_index] = '\0'; // Null terminate
-
-		// Using strstr to check for "iddqd" in the buffer
-		if (strstr(box->input_buffer, "iddqd"))
-		{
-			printf("GOD MODE active\n");
-			box->god = 1;
-			// Reset the buffer after detecting the code
-			ft_memset(box->input_buffer, 0, sizeof(box->input_buffer));
-			box->input_index = 0;
-		}
-		else if (box->input_index >= (int)sizeof(box->input_buffer) - 1) // If buffer is full
-		{
-			// Shift the buffer to the left by one character
-			ft_memmove(box->input_buffer, box->input_buffer + 1, sizeof(box->input_buffer) - 1);
-			box->input_index--;
-		}
-	}
 	// printf("Key pressed: %c, Current buffer: %s\n", (char)key, box->input_buffer);
 	// printf("Key released: %i\n", key);
 	return (0);
@@ -297,16 +273,6 @@ int	key_release(int key, t_box *box)
 */
 int	exit_hook(t_box *box)
 {
-
-	// if (box->pid > 0)
-	// {
-	// 	if (kill(box->pid, SIGTERM) == -1)
-	// 	{
-    //     	perror("Failed to terminate child process");
-    // 	}
-	// 	//waitpid(box.pid, NULL, 0);  // This waits for the child to terminate
-	// }
-
-	free_stuff(box);
+	free _stuff(box);
 	exit(0);
 }
