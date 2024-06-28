@@ -286,12 +286,12 @@ void	cal_sprite_move(t_box *box)
 			else if (sprites->data->dist < 0.1)
 			{
 				box->player.hit = 1;
-				if (box->god == 0 && !box->won && !box->lost)
+				if (box->game_state == RUNNING)
 				{
 					box->player.hp -= 1;
 					if (box->player.hp < 1)
 					{
-						box->lost = 1;
+						box->game_state = LOSE;
 						printf("YOU ARE DEAD!!!\n");
 						sound_play(box, &box->sound.sfx[FAIL]);
 						gettimeofday(&box->fin_time, NULL);
@@ -441,7 +441,7 @@ void	cal_sprite_move(t_box *box)
 			printf("YOU WIN!!!\n");
 			sound_play(box, &box->sound.sfx[FANFARE]);
 			sprite_remove(box, sprites);
-			box->won = 1;
+			box->game_state = WIN;
 			gettimeofday(&box->fin_time, NULL);
 			break;
 		}

@@ -27,49 +27,33 @@ void	init_textures(t_box *box)
 	png_file_to_image(box->mlx, &box->textures[WALL], "textures/wall.png");
 	png_file_to_image(box->mlx, &box->textures[FLOOR], "textures/floor.png");
 	png_file_to_image(box->mlx, &box->textures[BRICKS], "textures/grey_bricks.png");
-	png_file_to_image(box->mlx, &box->textures[DOOR], "textures/bars.png");
-	// box->textures[0].img = mlx_xpm_file_to_image(box->mlx, "textures/wall.xpm", &k, &j);
-	// box->textures[1].img = mlx_xpm_file_to_image(box->mlx, "textures/floor.xpm", &k, &j);
-	// box->textures[1].img = mlx_xpm_file_to_image(box->mlx, "textures/blackhole.xpm", &k, &j);
-	// box->textures[DOOR].img = mlx_xpm_file_to_image(box->mlx, "textures/bars.xpm", &k, &j);
+	png_file_to_image(box->mlx, &box->textures[JAIL], "textures/bars.png");
 	png_file_to_image(box->mlx, &box->textures[BABY], "textures/baby.png");
 	png_file_to_image(box->mlx, &box->textures[NERVE_ENDING], "textures/nerve_ending.png");
 	png_file_to_image(box->mlx, &box->textures[LEECH], "textures/leech.png");
 	png_file_to_image(box->mlx, &box->textures[ISAAC], "textures/isaac.png");
 	png_file_to_image(box->mlx, &box->textures[TEAR], "textures/tear.png");
 	png_file_to_image(box->mlx, &box->textures[LARRY_JR_HEAD], "textures/larry_jr.png");
-	// box->textures[BABY].img = mlx_xpm_file_to_image(box->mlx, "textures/baby.xpm", &k, &j);
-	// box->textures[NERVE_ENDING].img = mlx_xpm_file_to_image(box->mlx, "textures/nerve_ending.xpm", &k, &j);
-	// box->textures[LEECH].img = mlx_xpm_file_to_image(box->mlx, "textures/leech.xpm", &k, &j);
-	// box->textures[ISAAC].img = mlx_xpm_file_to_image(box->mlx, "textures/isaac.xpm", &k, &j);
-	// box->textures[TEAR].img = mlx_xpm_file_to_image(box->mlx, "textures/tear.xpm", &k, &j);
-	// box->textures[LARRY_JR_HEAD].img = mlx_xpm_file_to_image(box->mlx, "textures/larry_jr.xpm", &k, &j);
-	// box->textures[UI_PICKUPS].img = mlx_xpm_file_to_image(box->mlx, "textures/ui_pickups.xpm", &k, &j);
 	png_file_to_image(box->mlx, &box->textures[UI_PICKUPS], "textures/ui_pickups.png");
 	img_resize(box->mlx, &box->textures[UI_PICKUPS], 2);
 	split_spritesheet(&box->textures[UI_PICKUPS], 8, 5, 32, 32);
-	// box->textures[UI_HEARTS].img = mlx_xpm_file_to_image(box->mlx, "textures/ui_hearts.xpm", &k, &j);
+
 	png_file_to_image(box->mlx, &box->textures[UI_HEARTS], "textures/ui_hearts.png");
 	img_resize(box->mlx, &box->textures[UI_HEARTS], 2);
 	split_spritesheet(&box->textures[UI_HEARTS], 7, 4, 32, 32);
-	// box->textures[UI_STATS].img = mlx_xpm_file_to_image(box->mlx, "textures/ui_stats.xpm", &k, &j);
+
 	png_file_to_image(box->mlx, &box->textures[UI_STATS], "textures/ui_stats.png");
 	img_resize(box->mlx, &box->textures[UI_STATS], 2);
 	split_spritesheet(&box->textures[UI_STATS], 4, 4, 32, 32);
-	// box->textures[ITEMS].img = mlx_xpm_file_to_image(box->mlx, "textures/items.xpm", &k, &j);
+
 	png_file_to_image(box->mlx, &box->textures[ITEMS], "textures/items.png");
 	split_spritesheet(&box->textures[ITEMS], 20, 28, 32, 32);
+
 	png_file_to_image(box->mlx, &box->textures[ITEM_ALTAR], "textures/item_altar.png");
 	png_file_to_image(box->mlx, &box->textures[KEY], "textures/pickup_key.png");
 	png_file_to_image(box->mlx, &box->textures[TROPHY], "textures/trophy.png");
-	// box->textures[ITEM_ALTAR].img = mlx_xpm_file_to_image(box->mlx, "textures/item_altar.xpm", &k, &j);
-	// box->textures[KEY].img = mlx_xpm_file_to_image(box->mlx, "textures/pickup_key.xpm", &k, &j);
-	// box->textures[TROPHY].img = mlx_xpm_file_to_image(box->mlx, "textures/trophy.xpm", &k, &j);
-
-	// box->textures[WIN].img = mlx_xpm_file_to_image(box->mlx, "textures/win.xpm", &k, &j);
-	// box->textures[GRIM].img = mlx_xpm_file_to_image(box->mlx, "textures/grim.xpm", &k, &j);
-	png_file_to_image(box->mlx, &box->textures[WIN], "textures/win.png");
-	img_resize(box->mlx, &box->textures[WIN], 4);
+	png_file_to_image(box->mlx, &box->textures[YAY], "textures/win.png");
+	img_resize(box->mlx, &box->textures[YAY], 4);
 
 	png_file_to_image(box->mlx, &box->textures[GRIM], "textures/deathnote.png");
 	img_resize(box->mlx, &box->textures[GRIM], 2);
@@ -99,16 +83,6 @@ void	init_textures(t_box *box)
 		}
 		// box->textures[i].addr = (unsigned char *)mlx_get_data_addr(box->textures[i].img,
 			// &box->textures[i].bits_pp, &box->textures[i].line_len, &box->textures[i].endian);
-	box->title_menu = 1;
-	box->pause_menu = 0;
-	box->pause_menu_choice = 0;
-	box->start_menu = 0;
-	box->start_menu_choice = 0;
-	box->options_menu = 0;
-	box->options_menu_choice = 0;
-	box->mouse_hidden = 0;
-	box->sound.music_volume = 0.5;
-	box->sound.sfx_volume = 0.5;
 }
 
 void	init_sounds(t_box *box)
@@ -118,6 +92,8 @@ void	init_sounds(t_box *box)
 	i = -1;
 	while (++i < 50)
 		box->sound.playing[i].play = NULL;
+	box->sound.music_volume = 0.5;
+	box->sound.sfx_volume = 0.5;
 	box->sound.ctx = cs_make_context(0, 44100, 4096, 24, "cub3d");
 	cs_spawn_mix_thread(box->sound.ctx);
 	cs_thread_sleep_delay(box->sound.ctx, 10);
@@ -192,13 +168,13 @@ void	init_vals(t_box *box)
 	box->player.max_hp = 6;
 	box->player.hit = 0;
 	box->player.n_key = 0;
-	box->god = 0;
 	box->hud = 1;
-	box->won = 0;
-	box->lost = 0;
+	box->game_state = IN_TITLE_MENU;
+	box->pause_menu_choice = 0;
+	box->start_menu_choice = 0;
+	box->options_menu_choice = 0;
+	box->mouse_hidden = 0;
 	gettimeofday(&box->player.last_tear, NULL);
-	box->input_index = 0;
-	ft_memset(box->input_buffer, 0, sizeof(box->input_buffer));
 }
 
 void	reset_vals(t_box *box)

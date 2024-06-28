@@ -48,7 +48,7 @@ void	draw_map(t_box *box)
 void	draw_player(t_box *box)
 {
 	t_rect	rect;
-	
+
 	rect.x = (box->info.pos_y * 10) + SCREENWIDTH - (box->map_width * 10) - MINIMAP_OFFSET -5;
 	rect.y = (box->info.pos_x * 10) + MINIMAP_OFFSET -5;
 	rect.fill_color = 0x00e63946;
@@ -81,10 +81,10 @@ void	draw_rays(t_box *box)
 	{
 	line.begin_x = (box->info.pos_y * 10) + SCREENWIDTH - (box->map_width * 10) - MINIMAP_OFFSET ;
 	line.begin_y = (box->info.pos_x * 10) + MINIMAP_OFFSET ;
-	
+
 	line.end_x = box->info.ray[i].end_x;
 	line.end_y = box->info.ray[i].end_y;
-	
+
 	line.color = 0x00e63946;
 	draw_line(&line, box);
 	}

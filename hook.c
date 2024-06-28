@@ -14,7 +14,7 @@
 
 int	mouse_move(int x, int y, t_box *box)
 {
-	if (!box->start_menu && !box->title_menu && box->pause_menu && !box->options_menu)
+	if (box->game_state == IN_PAUSE_MENU)
 	{
 		if (x > 540 && x < 740 && y > 380 && y < 420)
 			box->pause_menu_choice = 1;
@@ -25,7 +25,7 @@ int	mouse_move(int x, int y, t_box *box)
 		else
 			box->pause_menu_choice = 0;
 	}
-	else if (box->start_menu && !box->title_menu && !box->pause_menu && !box->options_menu)
+	else if (box->game_state == IN_START_MENU)
 	{
 		if (x > 490 && x < 790 && y > 130 && y < 190)
 			box->start_menu_choice = 1;
@@ -40,7 +40,7 @@ int	mouse_move(int x, int y, t_box *box)
 		else
 			box->start_menu_choice = 0;
 	}
-	else if (!box->title_menu && box->options_menu)
+	else if (box->game_state == IN_PAUSE_OPTIONS || box->game_state == IN_START_OPTIONS)
 	{
 		if (x > 490 && x < 790 && y > 200 && y < 240)
 			box->options_menu_choice = 1;
@@ -54,30 +54,26 @@ int	mouse_move(int x, int y, t_box *box)
 
 int	mouse_press(int keycode, int x, int y, t_box *box)
 {
-	if (!box->start_menu && !box->title_menu && !box->pause_menu && !box->options_menu)
+	if (box->game_state == RUNNING)
 	{
 		if (keycode == 1)
 			box->player.cry = 1;
 		if (keycode == 3)
 			action_door(box);
 	}
-	else if (!box->start_menu && !box->title_menu && box->pause_menu && !box->options_menu)
+	else if (box->game_state == IN_PAUSE_MENU)
 	{
 		if (x > 540 && x < 740 && y > 380 && y < 420 && keycode == 1)
-			box->options_menu = 1;
+			box->game_state = IN_PAUSE_OPTIONS;
 		else if (x > 520 && x < 760 && y > 440 && y < 470 && keycode == 1)
 		{
-			box->pause_menu = 0;
+			box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
 		else if (x > 540 && x < 740 && y > 480 && y < 520 && keycode == 1)
-		{
-			box->pause_menu = 0;
-			box->options_menu = 0;
-			box->start_menu = 1;
-		}
+			box->game_state = IN_START_MENU;
 	}
-	else if (box->start_menu && !box->title_menu && !box->pause_menu && !box->options_menu)
+	else if (box->game_state == IN_START_MENU)
 	{
 		if (x > 490 && x < 790 && y > 130 && y < 190 && keycode == 1)
 		{
@@ -91,14 +87,14 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			fd = open("maps/hell.cub", O_RDONLY);
 			parser(box, fd);
 			close(fd);
-			box->start_menu = 0;
+			box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
 		else if (x > 500 && x < 790 && y > 230 && y < 280 && keycode == 1)
 		{
 			if (box->sprites)
 			{
-				box->start_menu = 0;
+				box->game_state = RUNNING;
 				gettimeofday(&box->time, NULL);
 			}
 		}
@@ -107,9 +103,9 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 		else if (x > 530 && x < 740 && y > 410 && y < 460 && keycode == 1)
 			printf("STATS\n");
 		else if (x > 540 && x < 800 && y > 500 && y < 560 && keycode == 1)
-			box->options_menu = 1;
+			box->game_state = IN_START_OPTIONS;
 	}
-	else if (!box->title_menu && box->options_menu)
+	else if (box->game_state == IN_PAUSE_OPTIONS || box->game_state == IN_START_OPTIONS)
 	{
 		if (y > 200 && y < 240 && keycode == 1)
 		{
@@ -138,11 +134,8 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			cs_set_volume(box->sound.playing[0].play, box->sound.music_volume, box->sound.music_volume);
 		}
 	}
-	if (!box->start_menu && box->title_menu && !box->pause_menu && !box->options_menu && keycode == 1)
-	{
-		box->title_menu = 0;
-		box->start_menu = 1;
-	}
+	if (box->game_state == IN_TITLE_MENU && keycode == 1)
+		box->game_state = IN_START_MENU;
 	// printf("X %i Y %i\n", x, y);
 	return (0);
 }
@@ -162,7 +155,7 @@ int	mouse_release(int keycode, int x, int y, t_box *box)
 */
 int	key_press(int key, t_box *box)
 {
-	if (!box->title_menu && !box->start_menu && !box->pause_menu && !box->options_menu)
+	if (box->game_state == RUNNING)
 	{
 		if (key == 113)
 			box->info.rotate = -1;
@@ -194,11 +187,8 @@ int	key_press(int key, t_box *box)
 				box->hud = 1;
 		}
 	}
-	if ((key == 32 || key == 65293) && box->title_menu && !box->start_menu && !box->pause_menu && !box->options_menu)
-	{
-		box->title_menu = 0;
-		box->start_menu = 1;
-	}
+	if ((key == 32 || key == 65293) && box->game_state == IN_TITLE_MENU)
+		box->game_state = IN_START_MENU;
 
 	// printf("Key pressed: %c, Current buffer: %s\n", (char)key, box->input_buffer);
 	// printf("Key released: %i\n", key);
@@ -213,36 +203,32 @@ int	key_release(int key, t_box *box)
 {
 	if (key == 65307)
 	{
-		if (!box->start_menu && !box->title_menu && !box->pause_menu && !box->options_menu)
-			box->pause_menu = 1;
-		else if (!box->start_menu && !box->title_menu && box->pause_menu && !box->options_menu)
+		if (box->game_state == RUNNING)
+			box->game_state = IN_PAUSE_MENU;
+		else if (box->game_state == IN_PAUSE_MENU)
 		{
-			box->pause_menu = 0;
-			box->options_menu = 0;
+			box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
-		else if (!box->start_menu && !box->title_menu && box->pause_menu && box->options_menu)
+		else if (box->game_state == IN_PAUSE_OPTIONS)
 		{
-			box->options_menu = 0;
+			box->game_state = IN_PAUSE_MENU;
 			gettimeofday(&box->time, NULL);
 			box->mouse.x = SCREENWIDTH / 2;
 			box->mouse.y = SCREENHEIGHT / 2;
 			redraw(box);
 		}
-		else if (box->start_menu && !box->title_menu && !box->pause_menu && box->options_menu)
-			box->options_menu = 0;
-		else if (box->start_menu && !box->title_menu && !box->pause_menu && !box->options_menu)
-		{
-			box->start_menu = 0;
-			box->title_menu = 1;
-		}
-		else if (!box->start_menu && box->title_menu && !box->pause_menu && !box->options_menu)
+		else if (box->game_state == IN_START_OPTIONS)
+			box->game_state = IN_START_MENU;
+		else if (box->game_state == IN_START_MENU)
+			box->game_state = IN_TITLE_MENU;
+		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
 		//mlx_destroy_window(box->mlx, box->win);
 		// exit_hook(box);
 		// exit(0);
 	}
-	if (!box->title_menu && !box->start_menu && !box->pause_menu && !box->options_menu)
+	if (box->game_state == RUNNING)
 	{
 		if (key == 113)
 			box->info.rotate = 0;
@@ -273,6 +259,6 @@ int	key_release(int key, t_box *box)
 */
 int	exit_hook(t_box *box)
 {
-	free _stuff(box);
+	free_stuff(box);
 	exit(0);
 }

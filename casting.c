@@ -62,14 +62,11 @@ void	cast_floor(t_box *box)
 			box->info.floor_x += box->info.floor_step_x;
 			box->info.floor_y += box->info.floor_step_y;
 
-			box->info.floor_texture = 1;
-			box->info.ceiling_texture = 1;
-
 			box->info.distance = (int)((box->info.pos_x - box->info.floor_x) * (box->info.pos_x - box->info.floor_x) + (box->info.pos_y - box->info.floor_y) * (box->info.pos_y - box->info.floor_y));
 
 			if (box->info.distance < 100)
 			{
-				box->info.color = extract_color(&box->textures[box->info.ceiling_texture].addr[box->info.tx * 4 + box->textures[box->info.floor_texture].line_len * box->info.ty]);
+				box->info.color = extract_color(&box->textures[FLOOR].addr[box->info.tx * 4 + box->textures[FLOOR].line_len * box->info.ty]);
 				box->info.color = (box->info.color >> 1) & 8355711;
 				my_mlx_pyxel_put(&box->image, x, y, 0xFF << 24 | box->info.color);
 				// printf("%d\n", box->info.distance);

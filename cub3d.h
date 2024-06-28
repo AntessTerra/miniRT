@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #ifndef CUB3D_H
 # define CUB3D_H
 
@@ -142,7 +140,7 @@ typedef struct s_info
 	float	cam_z;
 	int		up_down;
 	int		distance;
-	t_ray		*ray;
+	t_ray	*ray;
 	int		to_destroy;
 	int		flipped;
 	int		door;
@@ -180,58 +178,61 @@ typedef struct s_image
 # define LEFT 2
 # define RIGHT 3
 
+// Texture numbers
+typedef enum e_texture_numbers
+{
+	WALL,
+	BRICKS,
+	JAIL,
+	FLOOR,
+	BABY = 10,
+	NERVE_ENDING,
+	LEECH,
+	ISAAC,
+	LARRY_JR_HEAD,
+	LARRY_JR_BODY,
+	GRIM,
+	TEAR,
+	YAY,
+	KEY,
+	UI_PICKUPS,
+	UI_HEARTS,
+	UI_STATS,
+	ITEMS,
+	ITEM_ALTAR,
+	TROPHY,
+	PAUSE_MENU,
+	TITLE_MENU,
+	START_MENU,
+	MENU_BACK,
+	OPTIONS_MENU,
+	OPTIONS_MENU_DARK
+}				t_texture_numbers;
+
 typedef struct s_sprite_data
 {
-	double			x;
-	double			y;
-	double			start_x;
-	double			start_y;
-	double			travel;
-	int				id;
-	int				texture;
-	double			dist;
-	double			dir_x;
-	double			dir_y;
-	int				state;
-	int				frame;
-	int				hp;
-	int				n_seg;
-	int				start_n_seg;
-	int				seg;
-	int				hit;
-	struct timeval	hit_time;
-	int				opening;
-	struct timeval	action_time;
-	int				sound;
+	double					x;
+	double					y;
+	double					start_x;
+	double					start_y;
+	double					travel;
+	int						id;
+	t_texture_numbers		texture;
+	double					dist;
+	double					dir_x;
+	double					dir_y;
+	int						state;
+	int						frame;
+	int						hp;
+	int						n_seg;
+	int						start_n_seg;
+	int						seg;
+	int						hit;
+	struct timeval			hit_time;
+	int						opening;
+	struct timeval			action_time;
+	int						sound;
 }				t_sprite_data;
-
-//Texture numbers
-# define WALL 0
-# define FLOOR 1
-# define DOOR 2
-# define BRICKS 7
-# define BABY 10
-# define NERVE_ENDING 11
-# define LEECH 12
-# define ISAAC 20
-# define LARRY_JR_HEAD 30
-# define LARRY_JR_BODY 31
-# define GRIM 39
-# define TEAR 40
-# define WIN 42
-# define KEY 43
-# define UI_PICKUPS 44
-# define UI_HEARTS 45
-# define UI_STATS 46
-# define ITEMS 47
-# define ITEM_ALTAR 48
-# define TROPHY 49
-# define PAUSE_MENU 50
-# define TITLE_MENU 51
-# define START_MENU 52
-# define MENU_BACK 53
-# define OPTIONS_MENU 54
-# define OPTIONS_MENU_DARK 55
 
 typedef struct s_sprite
 {
@@ -254,30 +255,43 @@ typedef struct s_item
 }				t_item;
 
 //Sound tracks
-# define ANGRY 0
-# define DIE 1
-# define DOOR 2
-# define FAIL 3
-# define FANFARE 4
-# define KEY_PICKUP 5
-# define OW 6
-# define PAIN 7
-# define SHOT 8
-# define SPLASH 9
+typedef enum e_sound_tracks
+{
+	ANGRY,
+	DIE,
+	DOOR,
+	FAIL,
+	FANFARE,
+	KEY_PICKUP,
+	OW,
+	PAIN,
+	SHOT,
+	SPLASH,
+}				t_sound_tracks;
 
 typedef struct s_track
 {
-	cs_loaded_sound_t loaded;
-	cs_play_sound_def_t def;
+	cs_loaded_sound_t	loaded;
+	cs_play_sound_def_t	def;
 }				t_track;
+
+//Game states
+typedef enum e_game_state
+{
+	RUNNING,
+	IN_TITLE_MENU,
+	IN_START_MENU,
+	IN_START_OPTIONS,
+	IN_PAUSE_MENU,
+	IN_PAUSE_OPTIONS,
+	LOSE,
+	WIN
+}				t_game_state;
 
 typedef struct s_box
 {
-	int 			music;
 	char			*map_filename;
-	int				pid;
-	int				p;
-	char 			**env;
+	char			**env;
 	void			*mlx;
 	void			*win;
 	t_image			image;
@@ -302,7 +316,6 @@ typedef struct s_box
 		struct timeval	last_tear;
 		struct timeval	hit_time;
 	}				player;
-
 	int				n_sprites;
 	char			**map;
 	int				map_width;
@@ -310,6 +323,7 @@ typedef struct s_box
 	t_info			info;
 	struct timeval	time;
 	struct timeval	old_time;
+
 	struct s_mouse
 	{
 		int		x;
@@ -317,25 +331,16 @@ typedef struct s_box
 		double	xdistance;
 		double	ydistance;
 	}					mouse;
-
-	char			input_buffer[6];  // to store "iddqd" + '\0'
-	int				input_index;
-	int 			god;
 	int				hud;
-	int				lost;
-	int				won;
+	t_game_state	game_state;
 	struct timeval	fin_time;
-	int				title_menu;
-	int				pause_menu;
 	int				pause_menu_choice;
-	int				start_menu;
 	int				start_menu_choice;
-	int				options_menu;
 	int				options_menu_choice;
 	int				mouse_hidden;
 	struct				s_sound
 	{
-		cs_context_t*	ctx;
+		cs_context_t	*ctx;
 		t_track			music;
 		float			music_volume;
 		t_track			sfx[20];
@@ -345,11 +350,10 @@ typedef struct s_box
 			cs_playing_sound_t	*play;
 		}				playing[50];
 	}					sound;
-
 }				t_box;
 
 //shape rect used for drawing minimap
-typedef struct	s_rect
+typedef struct s_rect
 {
 	int			x;
 	int			y;
@@ -361,7 +365,7 @@ typedef struct	s_rect
 }				t_rect;
 
 //shape line
-typedef struct	s_line
+typedef struct s_line
 {
 	int			begin_x;
 	int			begin_y;
@@ -405,14 +409,16 @@ void		bubble_sort_sprites(t_box *box);
 void		redraw(t_box *box);
 int			extract_color(unsigned char *pixel);
 void		my_mlx_pyxel_put(t_image *image, int x, int y, int color);
-void		my_mlx_put_image_to_window(t_box *box, t_image *image, int x, int y, int sprite_id);
+void		my_mlx_put_image_to_window(t_box *box, t_image *image, \
+				int x, int y, int sprite_id);
 t_image		*new_image(void *mlx, t_image *image, int width, int height);
 void		clear_image(t_image *image);
 void		png_file_to_image(void *mlx, t_image *image, char *file);
 t_image		*img_resize(void *mlx_ptr, t_image *src_img, float n_times_bigger);
-void		split_spritesheet(t_image *image, int n_col, int n_row, int one_x, int one_y);
+void		split_spritesheet(t_image *image, int n_col, \
+				int n_row, int one_x, int one_y);
 void		apply_fog(t_box *box, double dist);
-unsigned int	pixel_visibility(float fade);
+uint32_t	pixel_visibility(float fade);
 void		hit_mark(t_box *box, t_sprite *sprite);
 
 //Casting.c
@@ -432,15 +438,8 @@ void		draw_rect(t_rect *rect, t_box *box);
 void		draw_line(t_line *line, t_box *box);
 
 //Sound.c
-int			music(char **env, char *track);
 void		load_audio_file(t_track *dst, char *path);
 void		sound_play(t_box *box, t_track *sound);
-
-//testing
-void		print_map_contents(t_box *box);
-void		fill_buffer_with_color(unsigned char *buffer, int width,
-				int height, int color);
-void		single_square_test(t_box *box);
 
 //Movement.c
 void		cal_move(t_box *box);
