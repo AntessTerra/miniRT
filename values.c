@@ -49,6 +49,15 @@ void	init_textures(t_box *box)
 	png_file_to_image(box->mlx, &box->textures[ITEMS], "textures/items.png");
 	split_spritesheet(&box->textures[ITEMS], 20, 28, 32, 32);
 
+	png_file_to_image(box->mlx, &box->textures[ALPHA], "textures/alpha.png");
+	img_resize(box->mlx, &box->textures[ALPHA], 0.5);
+	split_spritesheet(&box->textures[ALPHA], 9, 3, 55, 60);
+
+	png_file_to_image(box->mlx, &box->textures[NUMERIC], "textures/numeric.png");
+	img_resize(box->mlx, &box->textures[NUMERIC], 0.5);
+	split_spritesheet(&box->textures[NUMERIC], 9, 3, 55, 60);
+
+
 	png_file_to_image(box->mlx, &box->textures[ITEM_ALTAR], "textures/item_altar.png");
 	png_file_to_image(box->mlx, &box->textures[KEY], "textures/pickup_key.png");
 	png_file_to_image(box->mlx, &box->textures[TROPHY], "textures/trophy.png");
@@ -236,7 +245,6 @@ void	free_stuff(t_box *box)
 		cs_free_sound(&box->sound.sfx[i].loaded);
 	cs_free_sound(&box->sound.music.loaded);
 	cs_shutdown_context(box->sound.ctx);
-	// pthread_join(box->sound.ctx->thread, NULL);
 	free(box->textures);
 	if (box->sprites)
 	{

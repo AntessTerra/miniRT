@@ -42,7 +42,7 @@ void	draw_rect(t_rect *rect, t_box *box)
 	}
 }
 
- void	draw_line(t_line *line, t_box *box)
+void	draw_line(t_line *line, t_box *box)
 {
 	double	delta_x;
 	double	delta_y;
@@ -65,5 +65,35 @@ void	draw_rect(t_rect *rect, t_box *box)
 		pixel_x += delta_x;
 		pixel_y += delta_y;
 		pixels--;
+	}
+}
+
+/* String_to_image
+
+	Converts string to image SUP
+*/
+void	string_to_image(t_box *box, int x, int y, char *str)
+{
+	int		i;
+	int		j;
+
+	i = -1;
+	j = 0;
+	while (str[++i] && ++j)
+	{
+		if (str[i] >= 'a' && str[i] <= 'z')
+			my_mlx_put_image_to_window(box, &box->textures[ALPHA], \
+			x + (j * 30), y, str[i] - 'a');
+		else if (str[i] >= 'A' && str[i] <= 'Z')
+			my_mlx_put_image_to_window(box, &box->textures[ALPHA], \
+			x + (j * 30), y, str[i] - 'A');
+		else if (str[i] >= '0' && str[i] <= '9')
+			my_mlx_put_image_to_window(box, &box->textures[NUMERIC], \
+			x + (j * 30), y, str[i] - '0');
+		else if (ft_strchr(SPECIAL, str[i]) != NULL)
+			my_mlx_put_image_to_window(box, &box->textures[NUMERIC], \
+			x + (j * 30), y, (ft_strchr(SPECIAL, str[i]) - SPECIAL) + 10);
+		else
+			j--;
 	}
 }

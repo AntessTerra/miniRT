@@ -34,6 +34,25 @@ int	count_sprites(t_box *box)
 	return (counter);
 }
 
+/* Mouse_visibility
+
+	Hides or shows mouse on screen
+*/
+void mouse_visibility(t_box* box, bool hide)
+{
+	if (hide && !box->mouse_hidden)
+	{
+		mlx_mouse_hide(box->mlx, box->win);
+		mlx_mouse_move(box->mlx, box->win, SCREENWIDTH / 2, SCREENHEIGHT / 2);
+		box->mouse_hidden = 1;
+	}
+	else if (!hide && box->mouse_hidden)
+	{
+		mlx_mouse_show(box->mlx, box->win);
+		box->mouse_hidden = 0;
+	}
+}
+
 /*	Timer
 
 	Function for calculating FPS and redrawing screen every iteration
@@ -43,13 +62,8 @@ int	timer(t_box *box)
 	gettimeofday(&box->time, NULL);
 	if (box->game_state == IN_TITLE_MENU)
 	{
-		if (box->mouse_hidden)
-		{
-			mlx_mouse_show(box->mlx, box->win);
-			box->mouse_hidden = 0;
-		}
+		mouse_visibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[TITLE_MENU], 0, 0, -1);
-		gettimeofday(&box->time, NULL);
 		if (((int)((box->time.tv_usec / 100000.0) * 4) / 10) % 2 == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[TITLE_MENU].img, 400, 215, 0, 1000, 450, 450); //press start
 		else
@@ -82,11 +96,7 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
-		if (box->mouse_hidden)
-		{
-			mlx_mouse_show(box->mlx, box->win);
-			box->mouse_hidden = 0;
-		}
+		mouse_visibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		my_mlx_put_image_to_window(box, &box->textures[START_MENU], 0, 0, -1);
 		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
@@ -100,7 +110,7 @@ int	timer(t_box *box)
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 520, 440, 80, 1280, 340, 150); //OPTIONS
 		if (box->start_menu_choice == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 430, 120, 20, 800, 50, 100);
-		else if (box->start_menu_choice == 2)
+		else if (box->start_menu_choice == 2 && box->sprites)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 440, 210, 20, 800, 50, 100);
 		else if (box->start_menu_choice == 3)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 455, 300, 20, 800, 50, 100);
@@ -108,6 +118,10 @@ int	timer(t_box *box)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 470, 390, 20, 800, 50, 100);
 		else if (box->start_menu_choice == 5)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 480, 480, 20, 800, 50, 100);
+
+		my_mlx_put_image_to_window(box, &box->textures[ALPHA], 400, 100, ((int)((box->time.tv_usec / 100000.0) * 8) / 4) % 63);
+		my_mlx_put_image_to_window(box, &box->textures[NUMERIC], 400, 200, ((int)((box->time.tv_usec / 100000.0) * 8) / 4) % 63);
+		string_to_image(box, 100, 300, "012345!#$%&\()*+,-./:;<=>?@[\\]^_`{|}~");
 	}
 	else if (box->game_state == IN_PAUSE_OPTIONS)
 	{
@@ -127,11 +141,7 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_PAUSE_MENU)
 	{
-		if (box->mouse_hidden)
-		{
-			mlx_mouse_show(box->mlx, box->win);
-			box->mouse_hidden = 0;
-		}
+		mouse_visibility(box, false);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 400, 150, 0, 0, 480, 480);
 		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 		if (box->pause_menu_choice == 1)
@@ -143,17 +153,10 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == RUNNING)
 	{
-		if (!box->mouse_hidden)
-		{
-			mlx_mouse_hide(box->mlx, box->win);
-			mlx_mouse_move(box->mlx, box->win, SCREENWIDTH / 2, SCREENHEIGHT / 2);
-			box->mouse_hidden = 1;
-		}
+		mouse_visibility(box, true);
 		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 		mlx_mouse_move(box->mlx, box->win, SCREENWIDTH / 2, SCREENHEIGHT / 2);
-
 		redraw(box);
-
 	}
 	else if (box->game_state == LOSE)
 	{

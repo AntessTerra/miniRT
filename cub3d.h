@@ -42,6 +42,7 @@
 # define VMOVE 0.0
 # define MINIMAP_OFFSET 10
 # define PI (atan(1) * 4)
+# define SPECIAL ".,;:$#'!\"/?%&()@"
 
 typedef struct s_ray
 {
@@ -206,7 +207,9 @@ typedef enum e_texture_numbers
 	START_MENU,
 	MENU_BACK,
 	OPTIONS_MENU,
-	OPTIONS_MENU_DARK
+	OPTIONS_MENU_DARK,
+	ALPHA,
+	NUMERIC
 }				t_texture_numbers;
 
 typedef struct s_sprite_data
@@ -436,6 +439,7 @@ void		draw_rays(t_box *box);
 //Graphics.c
 void		draw_rect(t_rect *rect, t_box *box);
 void		draw_line(t_line *line, t_box *box);
+void		string_to_image(t_box *box, int x, int y, char *str);
 
 //Sound.c
 void		load_audio_file(t_track *dst, char *path);

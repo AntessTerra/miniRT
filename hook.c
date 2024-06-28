@@ -63,19 +63,19 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 	}
 	else if (box->game_state == IN_PAUSE_MENU)
 	{
-		if (x > 540 && x < 740 && y > 380 && y < 420 && keycode == 1)
+		if (box->pause_menu_choice == 1 && keycode == 1)
 			box->game_state = IN_PAUSE_OPTIONS;
-		else if (x > 520 && x < 760 && y > 440 && y < 470 && keycode == 1)
+		else if (box->pause_menu_choice == 2 && keycode == 1)
 		{
 			box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
-		else if (x > 540 && x < 740 && y > 480 && y < 520 && keycode == 1)
+		else if (box->pause_menu_choice == 3 && keycode == 1)
 			box->game_state = IN_START_MENU;
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
-		if (x > 490 && x < 790 && y > 130 && y < 190 && keycode == 1)
+		if (box->start_menu_choice == 1 && keycode == 1)
 		{
 			if (box->sprites != NULL)
 			{
@@ -90,19 +90,16 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
-		else if (x > 500 && x < 790 && y > 230 && y < 280 && keycode == 1)
+		else if (box->start_menu_choice == 2 && keycode == 1 && box->sprites)
 		{
-			if (box->sprites)
-			{
-				box->game_state = RUNNING;
-				gettimeofday(&box->time, NULL);
-			}
+			box->game_state = RUNNING;
+			gettimeofday(&box->time, NULL);
 		}
-		else if (x > 510 && x < 820 && y > 320 && y < 370 && keycode == 1)
+		else if (box->start_menu_choice == 3 && keycode == 1)
 			printf("CHALLANGES\n");
-		else if (x > 530 && x < 740 && y > 410 && y < 460 && keycode == 1)
+		else if (box->start_menu_choice == 4 && keycode == 1)
 			printf("STATS\n");
-		else if (x > 540 && x < 800 && y > 500 && y < 560 && keycode == 1)
+		else if (box->start_menu_choice == 5 && keycode == 1)
 			box->game_state = IN_START_OPTIONS;
 	}
 	else if (box->game_state == IN_PAUSE_OPTIONS || box->game_state == IN_START_OPTIONS)
@@ -224,9 +221,6 @@ int	key_release(int key, t_box *box)
 			box->game_state = IN_TITLE_MENU;
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
-		//mlx_destroy_window(box->mlx, box->win);
-		// exit_hook(box);
-		// exit(0);
 	}
 	if (box->game_state == RUNNING)
 	{
