@@ -19,7 +19,7 @@ CUTE_PNG = cute_png
 CUTE_SOUND = cute_sound
 UNAME_S := $(shell uname -s)
 
-SRC = main.c hook.c parser.c draw_image.c values.c casting.c minimap.c graphics.c movement.c sound.c items.c
+SRC = main.c hook.c parser.c draw_image.c values.c casting.c minimap.c graphics.c movement.c sound.c items.c multiplayer.c
 OBJ = $(SRC:.c=.o)
 
 ifeq ($(UNAME_S),Linux)

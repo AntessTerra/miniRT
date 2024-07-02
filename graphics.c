@@ -72,28 +72,22 @@ void	draw_line(t_line *line, t_box *box)
 
 	Converts string to image SUP
 */
-void	string_to_image(t_box *box, int x, int y, char *str)
+void	string_to_blacktext(t_box *box, int x, int y, char *str)
 {
 	int		i;
-	int		j;
 
 	i = -1;
-	j = 0;
-	while (str[++i] && ++j)
-	{
-		if (str[i] >= 'a' && str[i] <= 'z')
-			my_mlx_put_image_to_window(box, &box->textures[ALPHA], \
-			x + (j * 30), y, str[i] - 'a');
-		else if (str[i] >= 'A' && str[i] <= 'Z')
-			my_mlx_put_image_to_window(box, &box->textures[ALPHA], \
-			x + (j * 30), y, str[i] - 'A');
-		else if (str[i] >= '0' && str[i] <= '9')
-			my_mlx_put_image_to_window(box, &box->textures[NUMERIC], \
-			x + (j * 30), y, str[i] - '0');
-		else if (ft_strchr(SPECIAL, str[i]) != NULL)
-			my_mlx_put_image_to_window(box, &box->textures[NUMERIC], \
-			x + (j * 30), y, (ft_strchr(SPECIAL, str[i]) - SPECIAL) + 10);
-		else
-			j--;
-	}
+	while (str[++i])
+		my_mlx_put_image_to_window(box, &box->textures[FONT], \
+			x + (i * 37), y, str[i] - ' ');
+}
+
+void	string_to_graytext(t_box *box, int x, int y, char *str)
+{
+	int		i;
+
+	i = -1;
+	while (str[++i])
+		my_mlx_put_image_to_window(box, &box->textures[FONT_GRAY], \
+			x + (i * 37), y, str[i] - ' ');
 }

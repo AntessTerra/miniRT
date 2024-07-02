@@ -49,14 +49,11 @@ void	init_textures(t_box *box)
 	png_file_to_image(box->mlx, &box->textures[ITEMS], "textures/items.png");
 	split_spritesheet(&box->textures[ITEMS], 20, 28, 32, 32);
 
-	png_file_to_image(box->mlx, &box->textures[ALPHA], "textures/alpha.png");
-	img_resize(box->mlx, &box->textures[ALPHA], 0.5);
-	split_spritesheet(&box->textures[ALPHA], 9, 3, 55, 60);
+	png_file_to_image(box->mlx, &box->textures[FONT], "textures/font.png");
+	split_spritesheet(&box->textures[FONT], 19, 5, 50, 50);
 
-	png_file_to_image(box->mlx, &box->textures[NUMERIC], "textures/numeric.png");
-	img_resize(box->mlx, &box->textures[NUMERIC], 0.5);
-	split_spritesheet(&box->textures[NUMERIC], 9, 3, 55, 60);
-
+	png_file_to_image(box->mlx, &box->textures[FONT_GRAY], "textures/font_gray.png");
+	split_spritesheet(&box->textures[FONT_GRAY], 19, 5, 50, 50);
 
 	png_file_to_image(box->mlx, &box->textures[ITEM_ALTAR], "textures/item_altar.png");
 	png_file_to_image(box->mlx, &box->textures[KEY], "textures/pickup_key.png");
@@ -184,6 +181,14 @@ void	init_vals(t_box *box)
 	box->options_menu_choice = 0;
 	box->mouse_hidden = 0;
 	gettimeofday(&box->player.last_tear, NULL);
+	box->multiplayer.input_ip_index = 0;
+	box->multiplayer.inputed_ip = false;
+	box->multiplayer.connected = false;
+	box->multiplayer.client_listening = false;
+	box->multiplayer.input_ip[0] = '\0';
+	box->multiplayer.frame = 0;
+	box->multiplayer.n_clients = 0;
+	gettimeofday(&box->multiplayer.conn_time, NULL);
 }
 
 void	reset_vals(t_box *box)

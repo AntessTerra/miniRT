@@ -13,6 +13,12 @@
 #ifndef CUB3D_H
 # define CUB3D_H
 
+# include <sys/socket.h>
+# include <sys/ioctl.h>
+# include <net/if.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <sys/epoll.h>
 # include <stdio.h>
 # include <string.h>
 # include <stdlib.h>
@@ -42,7 +48,6 @@
 # define VMOVE 0.0
 # define MINIMAP_OFFSET 10
 # define PI (atan(1) * 4)
-# define SPECIAL ".,;:$#'!\"/?%&()@"
 
 typedef struct s_ray
 {
@@ -208,8 +213,8 @@ typedef enum e_texture_numbers
 	MENU_BACK,
 	OPTIONS_MENU,
 	OPTIONS_MENU_DARK,
-	ALPHA,
-	NUMERIC
+	FONT,
+	FONT_GRAY
 }				t_texture_numbers;
 
 typedef struct s_sprite_data
@@ -282,11 +287,14 @@ typedef struct s_track
 typedef enum e_game_state
 {
 	RUNNING,
+	RUNNING_LAN,
 	IN_TITLE_MENU,
 	IN_START_MENU,
 	IN_START_OPTIONS,
 	IN_PAUSE_MENU,
 	IN_PAUSE_OPTIONS,
+	HOSTING_GAME,
+	JOINING_GAME,
 	LOSE,
 	WIN
 }				t_game_state;
@@ -353,6 +361,25 @@ typedef struct s_box
 			cs_playing_sound_t	*play;
 		}				playing[50];
 	}					sound;
+
+	struct 				s_multiplayer
+	{
+		char			*host_ip;
+		char			input_ip[15];
+		int 			input_ip_index;
+		bool			inputed_ip;
+		struct timeval	conn_time;
+		int				frame;
+		int				fd;
+		int				server_sock;
+		int				epoll_sock;
+		int				client_sock;
+		int				connection_sock;
+		int				n_clients;
+		bool			connected;
+		bool			client_listening;
+		int				client_listening_sock;
+	}					multiplayer;
 }				t_box;
 
 //shape rect used for drawing minimap
@@ -439,7 +466,8 @@ void		draw_rays(t_box *box);
 //Graphics.c
 void		draw_rect(t_rect *rect, t_box *box);
 void		draw_line(t_line *line, t_box *box);
-void		string_to_image(t_box *box, int x, int y, char *str);
+void		string_to_blacktext(t_box *box, int x, int y, char *str);
+void		string_to_graytext(t_box *box, int x, int y, char *str);
 
 //Sound.c
 void		load_audio_file(t_track *dst, char *path);
@@ -452,5 +480,12 @@ void		action_door(t_box *box);
 
 //Main.c
 int			count_sprites(t_box *box);
+
+//Multiplayer.c
+int			get_ip(t_box* box);
+int			init_server(t_box *box, int port);
+int			connect_to_server(t_box *box, int port);
+int 		send_message(t_box *box, int fd, char *msg);
+int			receive_message(t_box *box, int fd);
 
 #endif

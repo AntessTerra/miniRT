@@ -38,7 +38,7 @@ int	count_sprites(t_box *box)
 
 	Hides or shows mouse on screen
 */
-void mouse_visibility(t_box* box, bool hide)
+void mouse_invisibility(t_box* box, bool hide)
 {
 	if (hide && !box->mouse_hidden)
 	{
@@ -60,9 +60,10 @@ void mouse_visibility(t_box* box, bool hide)
 int	timer(t_box *box)
 {
 	gettimeofday(&box->time, NULL);
+	mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 	if (box->game_state == IN_TITLE_MENU)
 	{
-		mouse_visibility(box, false);
+		mouse_invisibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[TITLE_MENU], 0, 0, -1);
 		if (((int)((box->time.tv_usec / 100000.0) * 4) / 10) % 2 == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[TITLE_MENU].img, 400, 215, 0, 1000, 450, 450); //press start
@@ -81,7 +82,6 @@ int	timer(t_box *box)
 	{
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU].img, 400, 100, 0, 0, 460, 480);
-		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU].img, 500, 200, 0, 480, 100, 40); //SFX
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU].img, 500, 260, 0, 920, 100, 40); //MUSIC
 
@@ -96,18 +96,17 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
-		mouse_visibility(box, false);
+		mouse_invisibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		my_mlx_put_image_to_window(box, &box->textures[START_MENU], 0, 0, -1);
-		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
-		mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 480, 120, 80, 800, 310, 100); //NEW RUN
+		string_to_blacktext(box, 480, 160, "NEW RUN");
 		if (box->sprites)
-			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 480, 200, 80, 920, 310, 100); //CONTINUE
+			string_to_blacktext(box, 490, 250, "CONTINUE");
 		else
-			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 480, 200, 420, 920, 310, 100); //CONTINUE GRAYED OUT
-		mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 500, 280, 80, 1040, 330, 110); //CHALLANGE
-		mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 510, 370, 80, 1160, 330, 110); //STATS
-		mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 520, 440, 80, 1280, 340, 150); //OPTIONS
+			string_to_graytext(box, 490, 250, "CONTINUE");
+		string_to_blacktext(box, 510, 340, "HOST LAN");
+		string_to_blacktext(box, 520, 430, "JOIN GAME");
+		string_to_blacktext(box, 540, 520, "OPTIONS");
 		if (box->start_menu_choice == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 430, 120, 20, 800, 50, 100);
 		else if (box->start_menu_choice == 2 && box->sprites)
@@ -118,15 +117,10 @@ int	timer(t_box *box)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 470, 390, 20, 800, 50, 100);
 		else if (box->start_menu_choice == 5)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[START_MENU].img, 480, 480, 20, 800, 50, 100);
-
-		my_mlx_put_image_to_window(box, &box->textures[ALPHA], 400, 100, ((int)((box->time.tv_usec / 100000.0) * 8) / 4) % 63);
-		my_mlx_put_image_to_window(box, &box->textures[NUMERIC], 400, 200, ((int)((box->time.tv_usec / 100000.0) * 8) / 4) % 63);
-		string_to_image(box, 100, 300, "012345!#$%&\()*+,-./:;<=>?@[\\]^_`{|}~");
 	}
 	else if (box->game_state == IN_PAUSE_OPTIONS)
 	{
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU_DARK].img, 400, 100, 0, 0, 460, 480);
-		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU_DARK].img, 500, 200, 0, 480, 100, 40); //SFX
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU_DARK].img, 500, 260, 0, 920, 100, 40); //MUSIC
 
@@ -141,9 +135,8 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_PAUSE_MENU)
 	{
-		mouse_visibility(box, false);
+		mouse_invisibility(box, false);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 400, 150, 0, 0, 480, 480);
-		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
 		if (box->pause_menu_choice == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 500, 390, 475, 5, 30, 30);
 		else if (box->pause_menu_choice == 2)
@@ -151,10 +144,117 @@ int	timer(t_box *box)
 		else if (box->pause_menu_choice == 3)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 505, 485, 475, 5, 30, 30);
 	}
+	else if (box->game_state == HOSTING_GAME)
+	{
+		mouse_invisibility(box, false);
+		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
+		string_to_blacktext(box, 300, 200, "OTHERS, JOIN THIS ADRESS:");
+		string_to_blacktext(box, 300, 250, box->multiplayer.host_ip);
+
+		struct epoll_event events[5];
+		int nfds = epoll_wait(box->multiplayer.epoll_sock, events, 5, 20);
+		int i;
+		i = -1;
+		while (++i < nfds)
+		{
+			if (events[i].data.fd == box->multiplayer.server_sock)
+			{
+				box->multiplayer.client_sock = accept(box->multiplayer.server_sock, NULL, NULL);
+				box->multiplayer.n_clients++;
+			}
+			else if (receive_message(box, events[i].data.fd))
+			{
+				printf("ERROR RECEIVING MESSAGE\n");
+				return (1);
+			}
+		}
+		if (box->multiplayer.connected)
+		{
+			string_to_blacktext(box, 300, 400, "PRESS ENTER TO START");
+			send_message(box, "START", box->multiplayer.client_sock);
+		}
+		else if (box->multiplayer.n_clients == 1 && !box->multiplayer.connected)
+		{
+			string_to_blacktext(box, 300, 350, "CONNECTION ESTABLISHED");
+			box->multiplayer.input_ip[0] = '1';
+			box->multiplayer.input_ip[1] = '0';
+			box->multiplayer.input_ip[2] = '.';
+			box->multiplayer.input_ip[3] = '1';
+			box->multiplayer.input_ip[4] = '2';
+			box->multiplayer.input_ip[5] = '.';
+			box->multiplayer.input_ip[6] = '4';
+			box->multiplayer.input_ip[7] = '.';
+			box->multiplayer.input_ip[8] = '4';
+			box->multiplayer.input_ip[9] = '\0';
+			if (connect_to_server(box, 25568))
+				return (1);
+			box->multiplayer.connected = true;
+		}
+		else if (box->multiplayer.n_clients < 1)
+		{
+
+			string_to_blacktext(box, 300, 350, "WAITING FOR CONNECTION");
+			int x;
+			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
+			while (x-- > 0)
+				string_to_blacktext(box, 300 + (x * 50), 400, ".");
+		}
+	}
+	else if (box->game_state == JOINING_GAME)
+	{
+		mouse_invisibility(box, false);
+		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
+		box->multiplayer.frame = ((((box->time.tv_sec - box->multiplayer.conn_time.tv_sec) + ((box->time.tv_usec - box->multiplayer.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+		string_to_blacktext(box, 300, 200, "ENTER HOST IP ADDRESS:");
+		if (ft_strlen(box->multiplayer.input_ip) > 0)
+			string_to_blacktext(box, 300, 250, box->multiplayer.input_ip);
+		if (box->multiplayer.client_listening)
+		{
+			string_to_blacktext(box, 300, 350, "WAITING FOR HOST TO REPLY");
+			struct epoll_event events[5];
+			int nfds = epoll_wait(box->multiplayer.epoll_sock, events, 5, 20);
+			int i;
+			i = -1;
+			while (++i < nfds)
+			{
+				if (events[i].data.fd == box->multiplayer.server_sock)
+				{
+					box->multiplayer.client_sock = accept(box->multiplayer.server_sock, NULL, NULL);
+					box->multiplayer.n_clients++;
+				}
+				else if (receive_message(box, events[i].data.fd))
+				{
+					printf("ERROR RECEIVING MESSAGE\n");
+					return (1);
+				}
+			}
+		}
+		else if (box->multiplayer.connected && !box->multiplayer.client_listening)
+		{
+			string_to_blacktext(box, 300, 300, "CONNECTION ESTABLISHED");
+			if (init_server(box, 25568))
+				return (1);
+			box->multiplayer.client_listening = true;
+		}
+		else if (box->multiplayer.inputed_ip && box->multiplayer.frame < 85)
+		{
+			if (!connect_to_server(box, 25567))
+				box->multiplayer.connected = true;
+			string_to_blacktext(box, 300, 300, "CONNECTING");
+			int x;
+			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
+			while (x-- > 0)
+				string_to_blacktext(box, 300 + (x * 50), 350, ".");
+		}
+		else if (box->multiplayer.inputed_ip && box->multiplayer.frame > 85)
+		{
+			string_to_blacktext(box, 300, 300, "CONNECTION FAILED");
+			string_to_blacktext(box, 300, 350, "PRESS ESC TO RETURN");
+		}
+	}
 	else if (box->game_state == RUNNING)
 	{
-		mouse_visibility(box, true);
-		mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
+		mouse_invisibility(box, true);
 		mlx_mouse_move(box->mlx, box->win, SCREENWIDTH / 2, SCREENHEIGHT / 2);
 		redraw(box);
 	}

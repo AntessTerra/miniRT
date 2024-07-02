@@ -27,13 +27,13 @@ int	mouse_move(int x, int y, t_box *box)
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
-		if (x > 490 && x < 790 && y > 130 && y < 190)
+		if (x > 490 && x < 790 && y > 150 && y < 200)
 			box->start_menu_choice = 1;
-		else if (x > 500 && x < 790 && y > 230 && y < 280)
+		else if (x > 500 && x < 790 && y > 240 && y < 290)
 			box->start_menu_choice = 2;
-		else if (x > 510 && x < 820 && y > 320 && y < 370)
+		else if (x > 510 && x < 820 && y > 330 && y < 380)
 			box->start_menu_choice = 3;
-		else if (x > 530 && x < 740 && y > 410 && y < 460)
+		else if (x > 530 && x < 860 && y > 420 && y < 470)
 			box->start_menu_choice = 4;
 		else if (x > 540 && x < 800 && y > 500 && y < 560)
 			box->start_menu_choice = 5;
@@ -96,9 +96,13 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			gettimeofday(&box->time, NULL);
 		}
 		else if (box->start_menu_choice == 3 && keycode == 1)
-			printf("CHALLANGES\n");
+		{
+			if (get_ip(box) || init_server(box, 25567))
+				return (1);
+			box->game_state = HOSTING_GAME;
+		}
 		else if (box->start_menu_choice == 4 && keycode == 1)
-			printf("STATS\n");
+			box->game_state = JOINING_GAME;
 		else if (box->start_menu_choice == 5 && keycode == 1)
 			box->game_state = IN_START_OPTIONS;
 	}
@@ -215,12 +219,27 @@ int	key_release(int key, t_box *box)
 			box->mouse.y = SCREENHEIGHT / 2;
 			redraw(box);
 		}
-		else if (box->game_state == IN_START_OPTIONS)
+		else if (box->game_state == IN_START_OPTIONS || (box->game_state == JOINING_GAME && !box->multiplayer.inputed_ip))
 			box->game_state = IN_START_MENU;
 		else if (box->game_state == IN_START_MENU)
 			box->game_state = IN_TITLE_MENU;
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
+		else if (box->game_state == JOINING_GAME && box->multiplayer.frame > 85 && box->multiplayer.inputed_ip)
+		{
+			box->game_state = IN_START_MENU;
+			box->multiplayer.inputed_ip = false;
+			box->multiplayer.input_ip_index = 0;
+			box->multiplayer.inputed_ip = false;
+			box->multiplayer.input_ip[0] = '\0';
+			close(box->multiplayer.connection_sock);
+		}
+		else if (box->game_state == HOSTING_GAME)
+		{
+			box->game_state = IN_START_MENU;
+			box->multiplayer.frame = 0;
+			close(box->multiplayer.server_sock);
+		}
 	}
 	if (box->game_state == RUNNING)
 	{
@@ -243,6 +262,22 @@ int	key_release(int key, t_box *box)
 		if (key == 65507)
 			box->info.pos_z = 0;
 	}
+	if (box->game_state == JOINING_GAME && !box->multiplayer.inputed_ip)
+	{
+		if ((key >= 48 && key <= 57 )|| key == 46)
+		{
+			box->multiplayer.input_ip[box->multiplayer.input_ip_index++] = (char)key;
+			box->multiplayer.input_ip[box->multiplayer.input_ip_index] = '\0';
+		}
+		if (key == 65288)
+			box->multiplayer.input_ip[--box->multiplayer.input_ip_index] = '\0';
+		if (box->multiplayer.input_ip_index == sizeof(box->multiplayer.input_ip) || key == 65293)
+		{
+			box->multiplayer.inputed_ip = true;
+			gettimeofday(&box->multiplayer.conn_time, NULL);
+		}
+	}
+
 	// printf("Key released: %i\n", key);
 	return (0);
 }

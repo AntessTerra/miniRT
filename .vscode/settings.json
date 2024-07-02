@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"stat.h": "c",
+		"ioctl.h": "c",
+		"dirent.h": "c"
+	}
+}
