@@ -299,6 +299,18 @@ typedef enum e_game_state
 	WIN
 }				t_game_state;
 
+typedef enum e_conn_state
+{
+	SERVER_AWATING_CONNECTION,
+	SERVER_CONNECTION_BACK,
+	SERVER_LISTENING,
+	CLIENT_WAITING_FOR_INPUT,
+	CLIENT_WAITING_FOR_CONNECTION,
+	CLIENT_CONN_FAILED,
+	CLIENT_OPENING_EPOLL,
+	CLIENT_LISTENING,
+}				t_conn_state;
+
 typedef struct s_box
 {
 	char			*map_filename;
@@ -344,6 +356,7 @@ typedef struct s_box
 	}					mouse;
 	int				hud;
 	t_game_state	game_state;
+	t_conn_state	conn_state;
 	struct timeval	fin_time;
 	int				pause_menu_choice;
 	int				start_menu_choice;
@@ -362,24 +375,33 @@ typedef struct s_box
 		}				playing[50];
 	}					sound;
 
-	struct 				s_multiplayer
+	struct 				s_server
 	{
-		char			*host_ip;
-		char			input_ip[15];
-		int 			input_ip_index;
-		bool			inputed_ip;
-		struct timeval	conn_time;
-		int				frame;
-		int				fd;
-		int				server_sock;
-		int				epoll_sock;
-		int				client_sock;
-		int				connection_sock;
-		int				n_clients;
-		bool			connected;
-		bool			client_listening;
-		int				client_listening_sock;
-	}					multiplayer;
+		char				*host_ip;
+		struct timeval		conn_time;
+		int					frame;
+		int					server_sock;
+		int					epoll_sock;
+		int					client_sock;
+		struct sockaddr_in	client_addr;
+		socklen_t			addr_len;
+		int					connection_sock;
+		char				*input_ip;
+	}					server;
+	struct				s_client
+	{
+		char				input_ip[15];
+		int 				input_ip_index;
+		struct timeval		conn_time;
+		int					frame;
+		int					server_sock;
+		struct sockaddr_in	server_addr;
+		socklen_t			addr_len;
+		int					epoll_sock;
+		int					connection_sock;
+		int					client_listening_sock;
+	}					client;
+	struct epoll_event	events[5];
 }				t_box;
 
 //shape rect used for drawing minimap
@@ -485,7 +507,9 @@ int			count_sprites(t_box *box);
 int			get_ip(t_box* box);
 int			init_server(t_box *box, int port);
 int			connect_to_server(t_box *box, int port);
+int			init_client(t_box *box, int port);
+int			connect_to_client(t_box *box, int port);
 int 		send_message(t_box *box, int fd, char *msg);
-int			receive_message(t_box *box, int fd);
+int 		receive_message(t_box *box, int fd);
 
 #endif

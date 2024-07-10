@@ -149,50 +149,58 @@ int	timer(t_box *box)
 		mouse_invisibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		string_to_blacktext(box, 300, 200, "OTHERS, JOIN THIS ADRESS:");
-		string_to_blacktext(box, 300, 250, box->multiplayer.host_ip);
+		string_to_blacktext(box, 300, 250, box->server.host_ip);
+		// box->server.frame = ((((box->time.tv_sec - box->server.conn_time.tv_sec) + ((box->time.tv_usec - box->server.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 
-		struct epoll_event events[5];
-		int nfds = epoll_wait(box->multiplayer.epoll_sock, events, 5, 20);
+		int nfds = epoll_wait(box->server.epoll_sock, box->events, 5, 20);
 		int i;
 		i = -1;
 		while (++i < nfds)
 		{
-			if (events[i].data.fd == box->multiplayer.server_sock)
+			if (box->events[i].data.fd == box->server.server_sock)
 			{
-				box->multiplayer.client_sock = accept(box->multiplayer.server_sock, NULL, NULL);
-				box->multiplayer.n_clients++;
+				box->server.addr_len = sizeof(box->server.client_addr);
+				box->server.client_sock = accept(box->server.server_sock, (struct sockaddr*)&box->server.client_addr,(socklen_t*)&box->server.addr_len);
+				box->server.input_ip = inet_ntoa(box->server.client_addr.sin_addr);
+				fcntl(box->server.client_sock, F_SETFL, O_NONBLOCK);
+				struct epoll_event ev;
+				ev.events = EPOLLIN | EPOLLET;
+				ev.data.fd = box->server.client_sock;
+				if (epoll_ctl(box->server.epoll_sock, EPOLL_CTL_ADD, box->server.client_sock, &ev))
+					return (close(box->server.epoll_sock), 1);
+				box->conn_state = SERVER_CONNECTION_BACK;
+				printf("CLIENT CONNECTED ON FD %i\n", box->server.client_sock);
 			}
-			else if (receive_message(box, events[i].data.fd))
+			else if (receive_message(box, box->events[i].data.fd))
 			{
 				printf("ERROR RECEIVING MESSAGE\n");
 				return (1);
 			}
 		}
-		if (box->multiplayer.connected)
+		if (box->conn_state == SERVER_LISTENING)
 		{
 			string_to_blacktext(box, 300, 400, "PRESS ENTER TO START");
-			send_message(box, "START", box->multiplayer.client_sock);
+			int x;
+			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
+			while (x-- > 0)
+				string_to_blacktext(box, 300 + (x * 50), 450, ".");
 		}
-		else if (box->multiplayer.n_clients == 1 && !box->multiplayer.connected)
+		else if (box->conn_state == SERVER_CONNECTION_BACK)
 		{
 			string_to_blacktext(box, 300, 350, "CONNECTION ESTABLISHED");
-			box->multiplayer.input_ip[0] = '1';
-			box->multiplayer.input_ip[1] = '0';
-			box->multiplayer.input_ip[2] = '.';
-			box->multiplayer.input_ip[3] = '1';
-			box->multiplayer.input_ip[4] = '2';
-			box->multiplayer.input_ip[5] = '.';
-			box->multiplayer.input_ip[6] = '4';
-			box->multiplayer.input_ip[7] = '.';
-			box->multiplayer.input_ip[8] = '4';
-			box->multiplayer.input_ip[9] = '\0';
-			if (connect_to_server(box, 25568))
-				return (1);
-			box->multiplayer.connected = true;
+			if (!connect_to_client(box, 25566))
+				box->conn_state = SERVER_LISTENING;
+			else
+			{
+				string_to_blacktext(box, 300, 350, "CONNECTING BACK");
+				int x;
+				x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
+				while (x-- > 0)
+					string_to_blacktext(box, 300 + (x * 50), 400, ".");
+			}
 		}
-		else if (box->multiplayer.n_clients < 1)
+		else if (box->conn_state == SERVER_AWATING_CONNECTION)
 		{
-
 			string_to_blacktext(box, 300, 350, "WAITING FOR CONNECTION");
 			int x;
 			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
@@ -204,49 +212,62 @@ int	timer(t_box *box)
 	{
 		mouse_invisibility(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
-		box->multiplayer.frame = ((((box->time.tv_sec - box->multiplayer.conn_time.tv_sec) + ((box->time.tv_usec - box->multiplayer.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+		box->client.frame = ((((box->time.tv_sec - box->client.conn_time.tv_sec) + ((box->time.tv_usec - box->client.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 		string_to_blacktext(box, 300, 200, "ENTER HOST IP ADDRESS:");
-		if (ft_strlen(box->multiplayer.input_ip) > 0)
-			string_to_blacktext(box, 300, 250, box->multiplayer.input_ip);
-		if (box->multiplayer.client_listening)
+		if (box->conn_state == CLIENT_WAITING_FOR_CONNECTION && box->client.frame > 85)
+			box->conn_state = CLIENT_CONN_FAILED;
+		if (ft_strlen(box->client.input_ip) > 0)
+			string_to_blacktext(box, 300, 250, box->client.input_ip);
+		if (box->conn_state == CLIENT_LISTENING)
 		{
-			string_to_blacktext(box, 300, 350, "WAITING FOR HOST TO REPLY");
-			struct epoll_event events[5];
-			int nfds = epoll_wait(box->multiplayer.epoll_sock, events, 5, 20);
+			int nfds = epoll_wait(box->client.epoll_sock, box->events, 5, 20);
+
 			int i;
 			i = -1;
 			while (++i < nfds)
 			{
-				if (events[i].data.fd == box->multiplayer.server_sock)
+				if (box->events[i].data.fd == box->client.client_listening_sock)
 				{
-					box->multiplayer.client_sock = accept(box->multiplayer.server_sock, NULL, NULL);
-					box->multiplayer.n_clients++;
+					box->client.addr_len = sizeof(box->client.server_addr);
+					box->client.server_sock = accept(box->client.client_listening_sock, (struct sockaddr*)&box->client.server_addr,(socklen_t*)&box->client.addr_len);
+					fcntl(box->client.server_sock, F_SETFL, O_NONBLOCK);
+					struct epoll_event ev;
+					ev.events = EPOLLIN | EPOLLET;
+					ev.data.fd = box->client.server_sock;
+					if (epoll_ctl(box->client.epoll_sock, EPOLL_CTL_ADD, box->client.server_sock, &ev))
+						return (close(box->client.epoll_sock), 1);
+					printf("SERVER CONNECTED ON FD %i\n", box->client.server_sock);
 				}
-				else if (receive_message(box, events[i].data.fd))
+				else if (receive_message(box, box->events[i].data.fd))
 				{
 					printf("ERROR RECEIVING MESSAGE\n");
 					return (1);
 				}
 			}
+			string_to_blacktext(box, 300, 350, "WAITING FOR HOST TO REPLY");
+			int x;
+			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
+			while (x-- > 0)
+				string_to_blacktext(box, 300 + (x * 50), 400, ".");
 		}
-		else if (box->multiplayer.connected && !box->multiplayer.client_listening)
+		else if (box->conn_state == CLIENT_OPENING_EPOLL)
 		{
 			string_to_blacktext(box, 300, 300, "CONNECTION ESTABLISHED");
-			if (init_server(box, 25568))
+			if (init_client(box, 25566))
 				return (1);
-			box->multiplayer.client_listening = true;
+			box->conn_state = CLIENT_LISTENING;
 		}
-		else if (box->multiplayer.inputed_ip && box->multiplayer.frame < 85)
+		else if (box->conn_state == CLIENT_WAITING_FOR_CONNECTION && box->client.frame < 85)
 		{
-			if (!connect_to_server(box, 25567))
-				box->multiplayer.connected = true;
+			if (!connect_to_server(box, 25565))
+				box->conn_state = CLIENT_OPENING_EPOLL;
 			string_to_blacktext(box, 300, 300, "CONNECTING");
 			int x;
 			x = (int)((box->time.tv_usec / 100000.0) * 4) / 10;
 			while (x-- > 0)
 				string_to_blacktext(box, 300 + (x * 50), 350, ".");
 		}
-		else if (box->multiplayer.inputed_ip && box->multiplayer.frame > 85)
+		else if (box->conn_state == CLIENT_CONN_FAILED)
 		{
 			string_to_blacktext(box, 300, 300, "CONNECTION FAILED");
 			string_to_blacktext(box, 300, 350, "PRESS ESC TO RETURN");

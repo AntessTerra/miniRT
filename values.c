@@ -181,14 +181,12 @@ void	init_vals(t_box *box)
 	box->options_menu_choice = 0;
 	box->mouse_hidden = 0;
 	gettimeofday(&box->player.last_tear, NULL);
-	box->multiplayer.input_ip_index = 0;
-	box->multiplayer.inputed_ip = false;
-	box->multiplayer.connected = false;
-	box->multiplayer.client_listening = false;
-	box->multiplayer.input_ip[0] = '\0';
-	box->multiplayer.frame = 0;
-	box->multiplayer.n_clients = 0;
-	gettimeofday(&box->multiplayer.conn_time, NULL);
+	box->server.frame = 0;
+	gettimeofday(&box->server.conn_time, NULL);
+	box->client.input_ip_index = 0;
+	box->client.input_ip[0] = '\0';
+	box->client.frame = 0;
+	gettimeofday(&box->client.conn_time, NULL);
 }
 
 void	reset_vals(t_box *box)
