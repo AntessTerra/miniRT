@@ -37,6 +37,7 @@
 # include <signal.h>
 # include <sys/wait.h>
 # include <stdbool.h>
+# include <errno.h>
 
 # define MOUSE_CONTROL 1
 # define SCREENWIDTH 1280
@@ -301,14 +302,13 @@ typedef enum e_game_state
 
 typedef enum e_conn_state
 {
-	SERVER_AWATING_CONNECTION,
-	SERVER_CONNECTION_BACK,
+	SERVER_EPOLL_INIT,
 	SERVER_LISTENING,
+	SERVER_READY,
 	CLIENT_WAITING_FOR_INPUT,
-	CLIENT_WAITING_FOR_CONNECTION,
-	CLIENT_CONN_FAILED,
-	CLIENT_OPENING_EPOLL,
 	CLIENT_LISTENING,
+	CLIENT_SERVER_NOT_FOUND,
+	CLIENT_READY
 }				t_conn_state;
 
 typedef struct s_box
@@ -506,10 +506,8 @@ int			count_sprites(t_box *box);
 //Multiplayer.c
 int			get_ip(t_box* box);
 int			init_server(t_box *box, int port);
-int			connect_to_server(t_box *box, int port);
 int			init_client(t_box *box, int port);
-int			connect_to_client(t_box *box, int port);
-int 		send_message(t_box *box, int fd, char *msg);
-int 		receive_message(t_box *box, int fd);
+int 		send_message(t_box *box, int fd, char *msg, struct sockaddr_in *client_address, socklen_t *client_address_len);
+int 		receive_message(t_box *box, int fd, struct sockaddr_in *client_address, socklen_t *client_address_len);
 
 #endif

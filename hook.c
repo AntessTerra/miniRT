@@ -99,7 +99,7 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 		{
 			if (get_ip(box) || init_server(box, 25565))
 				return (1);
-			box->conn_state = SERVER_AWATING_CONNECTION;
+			box->conn_state = SERVER_LISTENING;
 			box->game_state = HOSTING_GAME;
 		}
 		else if (box->start_menu_choice == 4 && keycode == 1)
@@ -229,7 +229,7 @@ int	key_release(int key, t_box *box)
 			box->game_state = IN_TITLE_MENU;
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
-		else if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_CONN_FAILED)
+		else if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_SERVER_NOT_FOUND)
 		{
 			box->game_state = IN_START_MENU;
 			box->client.input_ip_index = 0;
@@ -275,14 +275,17 @@ int	key_release(int key, t_box *box)
 			box->client.input_ip[--box->client.input_ip_index] = '\0';
 		if (box->client.input_ip_index == sizeof(box->client.input_ip) || key == 65293)
 		{
+			if (init_client(box, 25565))
+				return (printf("ERROR INITIALIZING CLIENT\n"), 1);
 			gettimeofday(&box->client.conn_time, NULL);
-			box->conn_state = CLIENT_WAITING_FOR_CONNECTION;
+			send_message(box, box->client.server_sock, "Hello from client", &box->client.server_addr, &box->client.addr_len);
+			printf("SEND HELLO TO SERVER!\n");
 		}
 	}
-	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_LISTENING)
-		send_message(box, box->server.client_sock, (char*)&key);
-	if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_LISTENING)
-		send_message(box, box->client.server_sock, (char*)&key);
+	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
+		send_message(box, box->server.server_sock, (char*)&key, &box->server.client_addr, &box->server.addr_len);
+	if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
+		send_message(box, box->client.server_sock, (char*)&key, &box->client.server_addr, &box->client.addr_len);
 
 	// printf("Key released: %i\n", key);
 	return (0);

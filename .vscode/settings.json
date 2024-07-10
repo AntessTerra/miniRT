@@ -1,7 +1,7 @@
 {
 	"files.associations": {
-		"stat.h": "c",
-		"ioctl.h": "c",
-		"dirent.h": "c"
+		"cerrno": "c",
+		"mlx.h": "c",
+		"in.h": "c"
 	}
 }
