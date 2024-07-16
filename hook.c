@@ -200,6 +200,14 @@ int	key_press(int key, t_box *box)
 	return (0);
 }
 
+void print_binary(unsigned int number)
+{
+	if (number >> 1) {
+		print_binary(number >> 1);
+	}
+	putc((number & 1) ? '1' : '0', stdout);
+}
+
 /*	Key_release
 
 	Processes let up key
@@ -234,7 +242,7 @@ int	key_release(int key, t_box *box)
 			box->game_state = IN_START_MENU;
 			box->client.input_ip_index = 0;
 			box->client.input_ip[0] = '\0';
-			close(box->client.connection_sock);
+			close(box->client.server_sock);
 		}
 		else if (box->game_state == HOSTING_GAME)
 		{
@@ -283,10 +291,24 @@ int	key_release(int key, t_box *box)
 		}
 	}
 	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
-		send_message(box, box->server.server_sock, (char*)&key, &box->server.client_addr, &box->server.addr_len);
+	{
+		if (box->server.packet_num == 1023)
+			box->server.packet_num = 0;
+		packet_add_back(&box->server.packets_to_send, new_packet((1 << 26) | (box->server.packet_num++ << 16) | key));
+		printf("ADDING PACKET TO LIST ID: %i	Inst. num: %i	Char: %c\n", box->server.packets_to_send->value >> 26, (box->server.packets_to_send->value >> 16) & 0x3FF, box->server.packets_to_send->value & 0xFFFF);
+	}
 	if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
-		send_message(box, box->client.server_sock, (char*)&key, &box->client.server_addr, &box->client.addr_len);
+	{
+		if (box->client.packet_num == 1023)
+			box->client.packet_num = 0;
+		packet_add_back(&box->client.packets_to_send, new_packet((1 << 26) | (box->client.packet_num++ << 16) | key));
+	}
 
+	// int packet;
+	// packet = (1 << 24) | (0 << 16) | key;
+	// printf("Key released: ");
+	// print_binary(packet);
+	// printf("\n");
 	// printf("Key released: %i\n", key);
 	return (0);
 }

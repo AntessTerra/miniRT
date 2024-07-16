@@ -83,7 +83,8 @@ void	init_textures(t_box *box)
 	img_resize(box->mlx, &box->textures[OPTIONS_MENU_DARK], 2);
 	i = -1;
 	while (++i < 100)
-		if (box->textures[i].img == NULL){
+		if (box->textures[i].img == NULL)
+		{
 			png_file_to_image(box->mlx, &box->textures[i], "textures/missing.png");
 			img_resize(box->mlx, &box->textures[i], 0.5);
 		}
@@ -126,6 +127,7 @@ void	init_sounds(t_box *box)
 */
 void	init_vals(t_box *box)
 {
+	// int i;
 	box->info.ray = malloc(sizeof(t_ray) * SCREENWIDTH + 1);
 	box->sprites = NULL;
 	box->items = NULL;
@@ -187,6 +189,10 @@ void	init_vals(t_box *box)
 	box->client.input_ip[0] = '\0';
 	box->client.frame = 0;
 	gettimeofday(&box->client.conn_time, NULL);
+	box->client.packet_num = 0;
+	box->client.packets_to_send = NULL;
+	box->server.packet_num = 0;
+	box->server.packets_to_send = NULL;
 }
 
 void	reset_vals(t_box *box)

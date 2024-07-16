@@ -12,6 +12,50 @@
 
 #include "cub3d.h"
 
+t_packet	*new_packet(int i)
+{
+	t_packet	*new;
+
+	new = ft_calloc(1, sizeof(t_packet));
+	if (!new)
+		return (NULL);
+	new->value = i;
+	new->next = NULL;
+	new->prev = NULL;
+	return (new);
+}
+
+t_packet	*last_packet(t_packet *i)
+{
+	if (!i)
+		return (NULL);
+	while (i->next)
+		i = i->next;
+	return (i);
+}
+
+void	packet_add_back(t_packet **head, t_packet *new)
+{
+	if (*head == NULL)
+		*head = new;
+	else
+	{
+		new->prev = last_packet(*head);
+		last_packet(*head)->next = new;
+	}
+}
+
+void	packet_remove(t_packet **head, t_packet *to_rem)
+{
+	if (to_rem == *head)
+		*head = (*head)->next;
+	else
+		to_rem->prev->next = to_rem->next;
+	if (to_rem->next)
+		to_rem->next->prev = to_rem->prev;
+	free(to_rem);
+}
+
 int get_ip(t_box *box)
 {
 	int fd;
@@ -94,38 +138,6 @@ int init_client(t_box *box, int port)
 	return (0);
 }
 
-// int connect_to_server(t_box *box, int port)
-// {
-// 	box->client.connection_sock = socket(AF_INET, SOCK_STREAM, 0);
-// 	if (box->client.connection_sock < 0)
-// 		return (1);
-// 	struct sockaddr_in serverAddress;
-// 	serverAddress.sin_family = AF_INET;
-// 	serverAddress.sin_port = htons(port);
-// 	serverAddress.sin_addr.s_addr = inet_addr(box->client.input_ip);
-
-// 	printf("Connecting to %s:%d\n", box->client.input_ip, port);
-// 	if (connect(box->client.connection_sock, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
-// 		return (1);
-// 	return (0);
-// }
-
-// int connect_to_client(t_box *box, int port)
-// {
-// 	box->server.connection_sock = socket(AF_INET, SOCK_STREAM, 0);
-// 	if (box->server.connection_sock < 0)
-// 		return (1);
-// 	struct sockaddr_in serverAddress;
-// 	serverAddress.sin_family = AF_INET;
-// 	serverAddress.sin_port = htons(port);
-// 	serverAddress.sin_addr.s_addr = inet_addr(box->server.input_ip);
-
-// 	printf("Connecting to %s:%d\n", box->server.input_ip, port);
-// 	if (connect(box->server.connection_sock, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
-// 		return (1);
-// 	return (0);
-// }
-
 int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, socklen_t *client_address_len)
 {
 	(void)box;
@@ -152,6 +164,19 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 	{
 		printf("SERVER READY\n");
 		box->conn_state = CLIENT_READY;
+	}
+	else if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_READY)
+	{
+		printf("RECIEVED PACKET AND PARSING\n");
+		int packet = ft_atoi(buffer);
+		// print_binary(packet);
+		printf("Client_id: %i	Inst. num: %i	Key: %c\n\n", packet >> 26, (packet >> 16) & 0x3FF, packet & 0xFFFF);
+		send_message(box, fd, "RECIEVED", &box->client.server_addr, &box->client.addr_len);
+	}
+	else if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY)
+	{
+		if (!ft_strncmp(buffer, "RECIEVED", 9) && box->server.packets_to_send)
+			packet_remove(&box->server.packets_to_send, box->server.packets_to_send);
 	}
 	return (0);
 }

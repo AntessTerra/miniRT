@@ -172,7 +172,16 @@ int	timer(t_box *box)
 				string_to_blacktext(box, 300 + (x * 50), 450, ".");
 		}
 		else if (box->conn_state == SERVER_READY)
+		{
 			string_to_blacktext(box, 300, 350, "PRESS ENTER TO START");
+			box->packet = box->server.packets_to_send;
+			while (box->packet)
+			{
+				printf("SENDING box->packet ID: %i\n", (box->packet->value >> 16) & 0x3FF);
+				send_message(box, box->server.server_sock, ft_itoa(box->packet->value), &box->server.client_addr, &box->server.addr_len);
+				box->packet = box->packet->next;
+			}
+		}
 	}
 	else if (box->game_state == JOINING_GAME)
 	{

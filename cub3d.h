@@ -10,6 +10,50 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef KEYCODES_H
+# define KEYCODES_H
+
+# define KC_A 97
+# define KC_B 98
+# define KC_C 99
+# define KC_D 100
+# define KC_E 101
+# define KC_F 102
+# define KC_G 103
+# define KC_H 104
+# define KC_I 105
+# define KC_J 106
+# define KC_K 107
+# define KC_L 108
+# define KC_M 109
+# define KC_N 110
+# define KC_O 111
+# define KC_P 112
+# define KC_Q 113
+# define KC_R 114
+# define KC_S 115
+# define KC_T 116
+# define KC_U 117
+# define KC_V 118
+# define KC_W 119
+# define KC_X 120
+# define KC_Y 121
+# define KC_Z 122
+# define MS_LEFT_CLICK 1
+# define MS_RIGHT_CLICK 3
+# define KC_LEFT_ARR 65361
+# define KC_RIGHT_ARR 65363
+# define KC_UP_ARR 65362
+# define KC_DOWN_ARR 65364
+# define KC_LEFT_SHIFT 65505
+# define KC_LEFT_CTRL 65507
+# define KC_SPACE 32
+# define KC_ESCAPE 65307
+# define KC_ENTER 65293
+# define KC_BACKSPACE 65288
+
+#endif
+
 #ifndef CUB3D_H
 # define CUB3D_H
 
@@ -302,7 +346,6 @@ typedef enum e_game_state
 
 typedef enum e_conn_state
 {
-	SERVER_EPOLL_INIT,
 	SERVER_LISTENING,
 	SERVER_READY,
 	CLIENT_WAITING_FOR_INPUT,
@@ -310,6 +353,13 @@ typedef enum e_conn_state
 	CLIENT_SERVER_NOT_FOUND,
 	CLIENT_READY
 }				t_conn_state;
+
+typedef struct s_packet
+{
+	int				value;
+	struct s_packet	*next;
+	struct s_packet	*prev;
+}				t_packet;
 
 typedef struct s_box
 {
@@ -385,8 +435,9 @@ typedef struct s_box
 		int					client_sock;
 		struct sockaddr_in	client_addr;
 		socklen_t			addr_len;
-		int					connection_sock;
 		char				*input_ip;
+		int					packet_num;
+		t_packet			*packets_to_send;
 	}					server;
 	struct				s_client
 	{
@@ -398,9 +449,11 @@ typedef struct s_box
 		struct sockaddr_in	server_addr;
 		socklen_t			addr_len;
 		int					epoll_sock;
-		int					connection_sock;
 		int					client_listening_sock;
+		int					packet_num;
+		t_packet			*packets_to_send;
 	}					client;
+	t_packet			*packet;
 	struct epoll_event	events[5];
 }				t_box;
 
@@ -434,6 +487,7 @@ int			key_release(int key, t_box *box);
 int			mouse_press(int keycode, int x, int y, t_box *box);
 int			mouse_release(int keycode, int x, int y, t_box *box);
 int			mouse_move(int x, int y, t_box *box);
+void		print_binary(unsigned int number);
 
 //Parser.c
 void		parser(t_box *box, int fd);
@@ -504,6 +558,9 @@ void		action_door(t_box *box);
 int			count_sprites(t_box *box);
 
 //Multiplayer.c
+t_packet	*new_packet(int i);
+t_packet	*last_packet(t_packet *i);
+void		packet_add_back(t_packet **head, t_packet *new);
 int			get_ip(t_box* box);
 int			init_server(t_box *box, int port);
 int			init_client(t_box *box, int port);
