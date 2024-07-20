@@ -226,6 +226,8 @@ int	timer(t_box *box)
 		if (box->player.frame > 115)
 			exit_hook(box);
 	}
+	// string_to_blacktext(box, 720, 650, (char *)GAME_STATE[box->game_state]);
+	// string_to_blacktext(box, 100, 650, (char *)CONN_STATE[box->conn_state]);
 	return (0);
 }
 

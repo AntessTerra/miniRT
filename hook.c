@@ -234,10 +234,13 @@ int	key_press(int key, t_box *box)
 	}
 	if ((key == 32 || key == 65293) && box->game_state == IN_TITLE_MENU)
 		box->game_state = IN_START_MENU;
-	if (box->game_state == RUNNING_LAN && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
-		send_message(box->server_sock, box, sizeof(struct s_box), &box->server_addr, &box->addr_len);
-	if (box->game_state == RUNNING_LAN && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
-		send_message(box->server_sock, box, sizeof(struct s_box), &box->server_addr, &box->addr_len);
+	if (box->game_state == RUNNING_LAN && key != 65293 && key != 65307)
+	{
+		t_partner partner;
+		partner.pos_x = box->info.pos_x;
+		partner.pos_y = box->info.pos_y;
+		send_message(box->server_sock, &partner, sizeof(struct s_partner), &box->server_addr, &box->addr_len);
+	}
 
 	// printf("Key pressed: %c, Current buffer: %s\n", (char)key, box->input_buffer);
 	// printf("Key released: %i\n", key);

@@ -10,49 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef KEYCODES_H
-# define KEYCODES_H
-
-# define KC_A 97
-# define KC_B 98
-# define KC_C 99
-# define KC_D 100
-# define KC_E 101
-# define KC_F 102
-# define KC_G 103
-# define KC_H 104
-# define KC_I 105
-# define KC_J 106
-# define KC_K 107
-# define KC_L 108
-# define KC_M 109
-# define KC_N 110
-# define KC_O 111
-# define KC_P 112
-# define KC_Q 113
-# define KC_R 114
-# define KC_S 115
-# define KC_T 116
-# define KC_U 117
-# define KC_V 118
-# define KC_W 119
-# define KC_X 120
-# define KC_Y 121
-# define KC_Z 122
-# define MS_LEFT_CLICK 1
-# define MS_RIGHT_CLICK 3
-# define KC_LEFT_ARR 65361
-# define KC_RIGHT_ARR 65363
-# define KC_UP_ARR 65362
-# define KC_DOWN_ARR 65364
-# define KC_LEFT_SHIFT 65505
-# define KC_LEFT_CTRL 65507
-# define KC_SPACE 32
-# define KC_ESCAPE 65307
-# define KC_ENTER 65293
-# define KC_BACKSPACE 65288
-
-#endif
 
 #ifndef CUB3D_H
 # define CUB3D_H
@@ -262,6 +219,47 @@ typedef enum e_texture_numbers
 	FONT_GRAY
 }				t_texture_numbers;
 
+//Game states
+typedef enum e_game_state
+{
+	RUNNING,
+	RUNNING_LAN,
+	IN_TITLE_MENU,
+	IN_START_MENU,
+	IN_START_OPTIONS,
+	IN_PAUSE_MENU,
+	IN_PAUSE_OPTIONS,
+	HOSTING_GAME,
+	JOINING_GAME,
+	LOSE,
+	WIN
+}				t_game_state;
+
+static const char *GAME_STATE[] = {
+    "RUNNING", "RUNNING_LAN", "IN_TITLE_MENU", "IN_START_MENU", "IN_START_OPTIONS", "IN_PAUSE_MENU", "IN_PAUSE_OPTIONS", "HOSTING_GAME", "JOINING_GAME", "LOSE", "WIN",
+};
+
+//Connection states
+typedef enum t_conn_state
+{
+	SERVER_LISTENING,
+	SERVER_READY,
+	CLIENT_WAITING_FOR_INPUT,
+	CLIENT_LISTENING,
+	CLIENT_SERVER_NOT_FOUND,
+	CLIENT_READY
+}				t_conn_state;
+
+static const char *CONN_STATE[] = {
+    "SERVER_LISTENING", "SERVER_READY", "CLIENT_WAITING_FOR_INPUT", "CLIENT_LISTENING", "CLIENT_SERVER_NOT_FOUND", "CLIENT_READY",
+};
+
+typedef struct s_partner
+{
+	float	pos_x;
+	float	pos_y;
+}				t_partner;
+
 typedef struct s_sprite_data
 {
 	double					x;
@@ -328,39 +326,6 @@ typedef struct s_track
 	cs_play_sound_def_t	def;
 }				t_track;
 
-//Game states
-typedef enum e_game_state
-{
-	RUNNING,
-	RUNNING_LAN,
-	IN_TITLE_MENU,
-	IN_START_MENU,
-	IN_START_OPTIONS,
-	IN_PAUSE_MENU,
-	IN_PAUSE_OPTIONS,
-	HOSTING_GAME,
-	JOINING_GAME,
-	LOSE,
-	WIN
-}				t_game_state;
-
-typedef enum e_conn_state
-{
-	SERVER_LISTENING,
-	SERVER_READY,
-	CLIENT_WAITING_FOR_INPUT,
-	CLIENT_LISTENING,
-	CLIENT_SERVER_NOT_FOUND,
-	CLIENT_READY
-}				t_conn_state;
-
-// typedef struct s_packet
-// {
-// 	int				value;
-// 	struct s_packet	*next;
-// 	struct s_packet	*prev;
-// }				t_packet;
-
 typedef struct s_box
 {
 	char			*map_filename;
@@ -390,24 +355,7 @@ typedef struct s_box
 		struct timeval	hit_time;
 	}				player;
 
-	struct s_partner
-	{
-		int				hp;
-		int				max_hp;
-		int				n_key;
-		int				speed;
-		int				range;
-		int				fire_rate;
-		int				shot_speed;
-		int				dmg;
-		int				cry;
-		int				state;
-		int				frame;
-		int				hit;
-		struct timeval	last_tear;
-		struct timeval	hit_time;
-		t_info			info;
-	}				partner;
+	t_partner		partner;
 	int				n_sprites;
 	char			**map;
 	int				map_width;

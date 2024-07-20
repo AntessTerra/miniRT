@@ -286,7 +286,7 @@ void	cal_sprite_move(t_box *box)
 			else if (sprites->data->dist < 0.1)
 			{
 				box->player.hit = 1;
-				if (box->game_state == RUNNING)
+				if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 				{
 					box->player.hp -= 1;
 					if (box->player.hp < 1)
@@ -447,8 +447,8 @@ void	cal_sprite_move(t_box *box)
 		}
 		if (sprites->data->texture == ISAAC)
 		{
-			sprites->data->x = box->partner.info.pos_x;
-			sprites->data->y = box->partner.info.pos_y;
+			sprites->data->x = box->partner.pos_x;
+			sprites->data->y = box->partner.pos_y;
 		}
 		if (sprites->data->texture == DOOR)
 		{

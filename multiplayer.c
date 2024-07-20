@@ -117,15 +117,15 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 
 	if ((box->conn_state == CLIENT_READY && box->game_state != JOINING_GAME) || box->conn_state == SERVER_READY)
 	{
-		t_box	another_one;
+		t_partner	another_one;
 
 		n = recvfrom(fd, &another_one, sizeof(another_one), 0, (struct sockaddr *)client_address, client_address_len);
 
 		if (n < 0)
 			return (1);
-		printf("PARNTER CORDS: %f	%f\n", another_one.info.pos_x, another_one.info.pos_y);
-		box->partner.hp = another_one.player.hp;
-		box->partner.info = another_one.info;
+		printf("PARNTER CORDS: %f	%f\n", another_one.pos_x, another_one.pos_y);
+		box->partner.pos_x = another_one.pos_x;
+		box->partner.pos_y = another_one.pos_y;
 	}
 	else
 	{
