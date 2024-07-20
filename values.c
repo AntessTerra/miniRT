@@ -183,16 +183,10 @@ void	init_vals(t_box *box)
 	box->options_menu_choice = 0;
 	box->mouse_hidden = 0;
 	gettimeofday(&box->player.last_tear, NULL);
-	box->server.frame = 0;
-	gettimeofday(&box->server.conn_time, NULL);
-	box->client.input_ip_index = 0;
-	box->client.input_ip[0] = '\0';
-	box->client.frame = 0;
-	gettimeofday(&box->client.conn_time, NULL);
-	box->client.packet_num = 0;
-	box->client.packets_to_send = NULL;
-	box->server.packet_num = 0;
-	box->server.packets_to_send = NULL;
+	box->input_ip_index = 0;
+	box->input_ip[0] = '\0';
+	box->frame = 0;
+	gettimeofday(&box->conn_time, NULL);
 }
 
 void	reset_vals(t_box *box)

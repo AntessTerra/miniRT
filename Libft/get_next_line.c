@@ -124,7 +124,7 @@ static char	*get_line(char *s)
 
 /*
 	S is an array of character pointers, each one will be tied to the
-	file descriptor as index. 
+	file descriptor as index.
 	this is to keep the read line of each file descriptor and appending to it.
 */
 

@@ -83,7 +83,7 @@
 # include <stdbool.h>
 # include <errno.h>
 
-# define MOUSE_CONTROL 1
+# define MOUSE_CONTROL 0
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
 # define TEXTUREWIDTH 64
@@ -239,13 +239,13 @@ typedef enum e_texture_numbers
 	BABY = 10,
 	NERVE_ENDING,
 	LEECH,
-	ISAAC,
-	LARRY_JR_HEAD,
+	ISAAC = 20,
+	LARRY_JR_HEAD = 30,
 	LARRY_JR_BODY,
 	GRIM,
-	TEAR,
+	TEAR = 40,
 	YAY,
-	KEY,
+	KEY = 43,
 	UI_PICKUPS,
 	UI_HEARTS,
 	UI_STATS,
@@ -354,12 +354,12 @@ typedef enum e_conn_state
 	CLIENT_READY
 }				t_conn_state;
 
-typedef struct s_packet
-{
-	int				value;
-	struct s_packet	*next;
-	struct s_packet	*prev;
-}				t_packet;
+// typedef struct s_packet
+// {
+// 	int				value;
+// 	struct s_packet	*next;
+// 	struct s_packet	*prev;
+// }				t_packet;
 
 typedef struct s_box
 {
@@ -389,6 +389,25 @@ typedef struct s_box
 		struct timeval	last_tear;
 		struct timeval	hit_time;
 	}				player;
+
+	struct s_partner
+	{
+		int				hp;
+		int				max_hp;
+		int				n_key;
+		int				speed;
+		int				range;
+		int				fire_rate;
+		int				shot_speed;
+		int				dmg;
+		int				cry;
+		int				state;
+		int				frame;
+		int				hit;
+		struct timeval	last_tear;
+		struct timeval	hit_time;
+		t_info			info;
+	}				partner;
 	int				n_sprites;
 	char			**map;
 	int				map_width;
@@ -396,7 +415,6 @@ typedef struct s_box
 	t_info			info;
 	struct timeval	time;
 	struct timeval	old_time;
-
 	struct s_mouse
 	{
 		int		x;
@@ -425,35 +443,15 @@ typedef struct s_box
 		}				playing[50];
 	}					sound;
 
-	struct 				s_server
-	{
-		char				*host_ip;
-		struct timeval		conn_time;
-		int					frame;
-		int					server_sock;
-		int					epoll_sock;
-		int					client_sock;
-		struct sockaddr_in	client_addr;
-		socklen_t			addr_len;
-		char				*input_ip;
-		int					packet_num;
-		t_packet			*packets_to_send;
-	}					server;
-	struct				s_client
-	{
-		char				input_ip[15];
-		int 				input_ip_index;
-		struct timeval		conn_time;
-		int					frame;
-		int					server_sock;
-		struct sockaddr_in	server_addr;
-		socklen_t			addr_len;
-		int					epoll_sock;
-		int					client_listening_sock;
-		int					packet_num;
-		t_packet			*packets_to_send;
-	}					client;
-	t_packet			*packet;
+	char				*host_ip;
+	char				input_ip[15];
+	int 				input_ip_index;
+	int					server_sock;
+	struct sockaddr_in	server_addr;
+	socklen_t			addr_len;
+	struct timeval		conn_time;
+	int					frame;
+	int					epoll_sock;
 	struct epoll_event	events[5];
 }				t_box;
 
@@ -487,7 +485,6 @@ int			key_release(int key, t_box *box);
 int			mouse_press(int keycode, int x, int y, t_box *box);
 int			mouse_release(int keycode, int x, int y, t_box *box);
 int			mouse_move(int x, int y, t_box *box);
-void		print_binary(unsigned int number);
 
 //Parser.c
 void		parser(t_box *box, int fd);
@@ -558,13 +555,10 @@ void		action_door(t_box *box);
 int			count_sprites(t_box *box);
 
 //Multiplayer.c
-t_packet	*new_packet(int i);
-t_packet	*last_packet(t_packet *i);
-void		packet_add_back(t_packet **head, t_packet *new);
 int			get_ip(t_box* box);
 int			init_server(t_box *box, int port);
 int			init_client(t_box *box, int port);
-int 		send_message(t_box *box, int fd, char *msg, struct sockaddr_in *client_address, socklen_t *client_address_len);
+int 		send_message(int fd, void *msg, int length, struct sockaddr_in *client_address, socklen_t *client_address_len);
 int 		receive_message(t_box *box, int fd, struct sockaddr_in *client_address, socklen_t *client_address_len);
 
 #endif

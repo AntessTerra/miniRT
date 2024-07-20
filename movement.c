@@ -445,6 +445,11 @@ void	cal_sprite_move(t_box *box)
 			gettimeofday(&box->fin_time, NULL);
 			break;
 		}
+		if (sprites->data->texture == ISAAC)
+		{
+			sprites->data->x = box->partner.info.pos_x;
+			sprites->data->y = box->partner.info.pos_y;
+		}
 		if (sprites->data->texture == DOOR)
 		{
 			if (sprites->data->opening)

@@ -34,11 +34,11 @@ int	count_sprites(t_box *box)
 	return (counter);
 }
 
-/* Mouse_visibility
+/* Mouse_hide
 
 	Hides or shows mouse on screen
 */
-void mouse_invisibility(t_box* box, bool hide)
+void mouse_hide(t_box* box, bool hide)
 {
 	if (hide && !box->mouse_hidden)
 	{
@@ -61,9 +61,24 @@ int	timer(t_box *box)
 {
 	gettimeofday(&box->time, NULL);
 	mlx_mouse_get_pos(box->mlx, box->win, &box->mouse.x, &box->mouse.y);
+	if (box->conn_state == SERVER_READY || box->conn_state == CLIENT_READY || box->game_state == HOSTING_GAME || box->conn_state == CLIENT_LISTENING)
+	{
+		int nfds = epoll_wait(box->epoll_sock, box->events, 5, 20);
+		int i;
+		i = -1;
+		while (++i < nfds)
+		{
+			if (box->conn_state == CLIENT_READY || box->conn_state == CLIENT_LISTENING)
+				if (receive_message(box, box->events[i].data.fd, &box->server_addr, &box->addr_len))
+					return (printf("ERROR RECEIVING MESSAGE\n"), 1);
+			if (box->conn_state == SERVER_READY || box->game_state == HOSTING_GAME)
+				if (receive_message(box, box->events[i].data.fd, &box->server_addr, &box->addr_len))
+					return (printf("ERROR RECEIVING MESSAGE\n"), 1);
+		}
+	}
 	if (box->game_state == IN_TITLE_MENU)
 	{
-		mouse_invisibility(box, false);
+		mouse_hide(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[TITLE_MENU], 0, 0, -1);
 		if (((int)((box->time.tv_usec / 100000.0) * 4) / 10) % 2 == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[TITLE_MENU].img, 400, 215, 0, 1000, 450, 450); //press start
@@ -96,7 +111,7 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
-		mouse_invisibility(box, false);
+		mouse_hide(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		my_mlx_put_image_to_window(box, &box->textures[START_MENU], 0, 0, -1);
 		string_to_blacktext(box, 480, 160, "NEW RUN");
@@ -135,7 +150,7 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == IN_PAUSE_MENU)
 	{
-		mouse_invisibility(box, false);
+		mouse_hide(box, false);
 		mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 400, 150, 0, 0, 480, 480);
 		if (box->pause_menu_choice == 1)
 			mlx_put_image_to_window(box->mlx, box->win, box->textures[PAUSE_MENU].img, 500, 390, 475, 5, 30, 30);
@@ -146,23 +161,10 @@ int	timer(t_box *box)
 	}
 	else if (box->game_state == HOSTING_GAME)
 	{
-		mouse_invisibility(box, false);
+		mouse_hide(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
 		string_to_blacktext(box, 300, 200, "OTHERS, JOIN THIS ADRESS:");
-		string_to_blacktext(box, 300, 250, box->server.host_ip);
-		// box->server.frame = ((((box->time.tv_sec - box->server.conn_time.tv_sec) + ((box->time.tv_usec - box->server.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
-
-		int nfds = epoll_wait(box->server.epoll_sock, box->events, 5, 20);
-		int i;
-		i = -1;
-		while (++i < nfds)
-		{
-			if (receive_message(box, box->events[i].data.fd, &box->server.client_addr, &box->server.addr_len))
-			{
-				printf("ERROR RECEIVING MESSAGE %i\n", box->events[i].data.fd);
-				return (1);
-			}
-		}
+		string_to_blacktext(box, 300, 250, box->host_ip);
 		if (box->conn_state == SERVER_LISTENING)
 		{
 			string_to_blacktext(box, 300, 350, "WAITING FOR CONNECTION");
@@ -172,39 +174,18 @@ int	timer(t_box *box)
 				string_to_blacktext(box, 300 + (x * 50), 450, ".");
 		}
 		else if (box->conn_state == SERVER_READY)
-		{
 			string_to_blacktext(box, 300, 350, "PRESS ENTER TO START");
-			box->packet = box->server.packets_to_send;
-			while (box->packet)
-			{
-				printf("SENDING box->packet ID: %i\n", (box->packet->value >> 16) & 0x3FF);
-				send_message(box, box->server.server_sock, ft_itoa(box->packet->value), &box->server.client_addr, &box->server.addr_len);
-				box->packet = box->packet->next;
-			}
-		}
 	}
 	else if (box->game_state == JOINING_GAME)
 	{
-		mouse_invisibility(box, false);
+		mouse_hide(box, false);
 		my_mlx_put_image_to_window(box, &box->textures[MENU_BACK], 0, 0, -1);
-		box->client.frame = ((((box->time.tv_sec - box->client.conn_time.tv_sec) + ((box->time.tv_usec - box->client.conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+		box->frame = ((((box->time.tv_sec - box->conn_time.tv_sec) + ((box->time.tv_usec - box->conn_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 		string_to_blacktext(box, 300, 200, "ENTER HOST IP ADDRESS:");
-		if (box->conn_state == CLIENT_LISTENING && box->client.frame > 85)
+		if (box->conn_state == CLIENT_LISTENING && box->frame > 85)
 			box->conn_state = CLIENT_SERVER_NOT_FOUND;
-		if (ft_strlen(box->client.input_ip) > 0)
-			string_to_blacktext(box, 300, 250, box->client.input_ip);
-
-		int nfds = epoll_wait(box->client.epoll_sock, box->events, 5, 20);
-		int i;
-		i = -1;
-		while (++i < nfds)
-		{
-			if (receive_message(box, box->events[i].data.fd, &box->client.server_addr, &box->client.addr_len))
-			{
-				printf("ERROR RECEIVING MESSAGE\n");
-				return (1);
-			}
-		}
+		if (ft_strlen(box->input_ip) > 0)
+			string_to_blacktext(box, 300, 250, box->input_ip);
 		if (box->conn_state == CLIENT_LISTENING)
 		{
 			string_to_blacktext(box, 300, 350, "WAITING FOR SERVER");
@@ -224,9 +205,9 @@ int	timer(t_box *box)
 				string_to_blacktext(box, 300 + (x * 50), 400, ".");
 		}
 	}
-	else if (box->game_state == RUNNING)
+	else if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 	{
-		mouse_invisibility(box, true);
+		mouse_hide(box, true);
 		mlx_mouse_move(box->mlx, box->win, SCREENWIDTH / 2, SCREENHEIGHT / 2);
 		redraw(box);
 	}

@@ -54,7 +54,7 @@ int	mouse_move(int x, int y, t_box *box)
 
 int	mouse_press(int keycode, int x, int y, t_box *box)
 {
-	if (box->game_state == RUNNING)
+	if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 	{
 		if (keycode == 1)
 			box->player.cry = 1;
@@ -67,11 +67,27 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			box->game_state = IN_PAUSE_OPTIONS;
 		else if (box->pause_menu_choice == 2 && keycode == 1)
 		{
-			box->game_state = RUNNING;
+			if (box->conn_state == CLIENT_READY || box->conn_state == SERVER_READY)
+				box->game_state = RUNNING_LAN;
+			else
+				box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
 		else if (box->pause_menu_choice == 3 && keycode == 1)
+		{
+			if (box->conn_state == SERVER_READY || box->conn_state == CLIENT_READY)
+			{
+				close(box->server_sock);
+				close(box->epoll_sock);
+				if (box->sprites != NULL)
+				{
+					free_sprites(box);
+					free_map(box);
+					init_vals(box);
+				}
+			}
 			box->game_state = IN_START_MENU;
+		}
 	}
 	else if (box->game_state == IN_START_MENU)
 	{
@@ -84,7 +100,7 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 				init_vals(box);
 			}
 			int fd;
-			fd = open("maps/hell.cub", O_RDONLY);
+			fd = open("maps/arena.cub", O_RDONLY);
 			parser(box, fd);
 			close(fd);
 			box->game_state = RUNNING;
@@ -97,6 +113,18 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 		}
 		else if (box->start_menu_choice == 3 && keycode == 1)
 		{
+			if (box->sprites != NULL)
+			{
+				free_sprites(box);
+				free_map(box);
+				init_vals(box);
+			}
+			int fd;
+			fd = open("maps/hell.cub", O_RDONLY);
+			parser(box, fd);
+			close(fd);
+			gettimeofday(&box->time, NULL);
+			sprite_append(box, 4, 3, ISAAC);
 			if (get_ip(box) || init_server(box, 25565))
 				return (1);
 			box->conn_state = SERVER_LISTENING;
@@ -104,6 +132,18 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 		}
 		else if (box->start_menu_choice == 4 && keycode == 1)
 		{
+			if (box->sprites != NULL)
+			{
+				free_sprites(box);
+				free_map(box);
+				init_vals(box);
+			}
+			int fd;
+			fd = open("maps/hell.cub", O_RDONLY);
+			parser(box, fd);
+			close(fd);
+			gettimeofday(&box->time, NULL);
+			sprite_append(box, 4, 3, ISAAC);
 			box->conn_state = CLIENT_WAITING_FOR_INPUT;
 			box->game_state = JOINING_GAME;
 		}
@@ -160,7 +200,7 @@ int	mouse_release(int keycode, int x, int y, t_box *box)
 */
 int	key_press(int key, t_box *box)
 {
-	if (box->game_state == RUNNING)
+	if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 	{
 		if (key == 113)
 			box->info.rotate = -1;
@@ -194,19 +234,24 @@ int	key_press(int key, t_box *box)
 	}
 	if ((key == 32 || key == 65293) && box->game_state == IN_TITLE_MENU)
 		box->game_state = IN_START_MENU;
+	if (box->game_state == RUNNING_LAN && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
+		send_message(box->server_sock, box, sizeof(struct s_box), &box->server_addr, &box->addr_len);
+	if (box->game_state == RUNNING_LAN && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
+		send_message(box->server_sock, box, sizeof(struct s_box), &box->server_addr, &box->addr_len);
 
 	// printf("Key pressed: %c, Current buffer: %s\n", (char)key, box->input_buffer);
 	// printf("Key released: %i\n", key);
+	printf("CURRENT POSSITION: %f	%f\n", box->info.pos_x, box->info.pos_y);
 	return (0);
 }
 
-void print_binary(unsigned int number)
-{
-	if (number >> 1) {
-		print_binary(number >> 1);
-	}
-	putc((number & 1) ? '1' : '0', stdout);
-}
+// void print_binary(unsigned int number)
+// {
+// 	if (number >> 1) {
+// 		print_binary(number >> 1);
+// 	}
+// 	putc((number & 1) ? '1' : '0', stdout);
+// }
 
 /*	Key_release
 
@@ -216,11 +261,14 @@ int	key_release(int key, t_box *box)
 {
 	if (key == 65307)
 	{
-		if (box->game_state == RUNNING)
+		if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 			box->game_state = IN_PAUSE_MENU;
 		else if (box->game_state == IN_PAUSE_MENU)
 		{
-			box->game_state = RUNNING;
+			if (box->conn_state == CLIENT_READY || box->conn_state == SERVER_READY)
+				box->game_state = RUNNING_LAN;
+			else
+				box->game_state = RUNNING;
 			gettimeofday(&box->time, NULL);
 		}
 		else if (box->game_state == IN_PAUSE_OPTIONS)
@@ -231,27 +279,40 @@ int	key_release(int key, t_box *box)
 			box->mouse.y = SCREENHEIGHT / 2;
 			redraw(box);
 		}
-		else if (box->game_state == IN_START_OPTIONS || (box->game_state == JOINING_GAME && box->conn_state == CLIENT_WAITING_FOR_INPUT))
+		else if (box->game_state == IN_START_OPTIONS)
 			box->game_state = IN_START_MENU;
 		else if (box->game_state == IN_START_MENU)
 			box->game_state = IN_TITLE_MENU;
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
-		else if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_SERVER_NOT_FOUND)
+		else if (box->game_state == JOINING_GAME && (box->conn_state == CLIENT_SERVER_NOT_FOUND || box->conn_state == CLIENT_WAITING_FOR_INPUT))
 		{
+			box->input_ip_index = 0;
+			box->input_ip[0] = '\0';
+			close(box->server_sock);
+			close(box->epoll_sock);
+			if (box->sprites != NULL)
+			{
+				free_sprites(box);
+				free_map(box);
+				init_vals(box);
+			}
 			box->game_state = IN_START_MENU;
-			box->client.input_ip_index = 0;
-			box->client.input_ip[0] = '\0';
-			close(box->client.server_sock);
 		}
 		else if (box->game_state == HOSTING_GAME)
 		{
+			close(box->server_sock);
+			close(box->epoll_sock);
+			if (box->sprites != NULL)
+			{
+				free_sprites(box);
+				free_map(box);
+				init_vals(box);
+			}
 			box->game_state = IN_START_MENU;
-			box->server.frame = 0;
-			close(box->server.server_sock);
 		}
 	}
-	if (box->game_state == RUNNING)
+	if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 	{
 		if (key == 113)
 			box->info.rotate = 0;
@@ -276,33 +337,30 @@ int	key_release(int key, t_box *box)
 	{
 		if ((key >= 48 && key <= 57 )|| key == 46)
 		{
-			box->client.input_ip[box->client.input_ip_index++] = (char)key;
-			box->client.input_ip[box->client.input_ip_index] = '\0';
+			box->input_ip[box->input_ip_index++] = (char)key;
+			box->input_ip[box->input_ip_index] = '\0';
 		}
 		if (key == 65288)
-			box->client.input_ip[--box->client.input_ip_index] = '\0';
-		if (box->client.input_ip_index == sizeof(box->client.input_ip) || key == 65293)
+			box->input_ip[--box->input_ip_index] = '\0';
+		if (box->input_ip_index == sizeof(box->input_ip) || key == 65293)
 		{
 			if (init_client(box, 25565))
 				return (printf("ERROR INITIALIZING CLIENT\n"), 1);
-			gettimeofday(&box->client.conn_time, NULL);
-			send_message(box, box->client.server_sock, "Hello from client", &box->client.server_addr, &box->client.addr_len);
+			gettimeofday(&box->conn_time, NULL);
+			send_message(box->server_sock, "Hello from client", ft_strlen("Hello from client"), &box->server_addr, &box->addr_len);
 			printf("SEND HELLO TO SERVER!\n");
 		}
 	}
-	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
+	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY && key == 65293)
 	{
-		if (box->server.packet_num == 1023)
-			box->server.packet_num = 0;
-		packet_add_back(&box->server.packets_to_send, new_packet((1 << 26) | (box->server.packet_num++ << 16) | key));
-		printf("ADDING PACKET TO LIST ID: %i	Inst. num: %i	Char: %c\n", box->server.packets_to_send->value >> 26, (box->server.packets_to_send->value >> 16) & 0x3FF, box->server.packets_to_send->value & 0xFFFF);
+		send_message(box->server_sock, "START GAME", ft_strlen("START GAME"), &box->server_addr, &box->addr_len);
+		box->game_state = RUNNING_LAN;
+		gettimeofday(&box->time, NULL);
 	}
-	if (box->game_state == JOINING_GAME && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
-	{
-		if (box->client.packet_num == 1023)
-			box->client.packet_num = 0;
-		packet_add_back(&box->client.packets_to_send, new_packet((1 << 26) | (box->client.packet_num++ << 16) | key));
-	}
+	// if (box->game_state == RUNNING_LAN && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
+	// 	send_message(box->server.server_sock, box, sizeof(struct s_box), &box->server.client_addr, &box->server.addr_len);
+	// if (box->game_state == RUNNING_LAN && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
+	// 	send_message(box->client.server_sock, box, sizeof(struct s_box), &box->client.server_addr, &box->client.addr_len);
 
 	// int packet;
 	// packet = (1 << 24) | (0 << 16) | key;
