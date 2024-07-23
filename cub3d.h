@@ -40,7 +40,7 @@
 # include <stdbool.h>
 # include <errno.h>
 
-# define MOUSE_CONTROL 0
+# define MOUSE_CONTROL 1
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
 # define TEXTUREWIDTH 64
@@ -256,8 +256,17 @@ static const char *CONN_STATE[] = {
 
 typedef struct s_partner
 {
-	float	pos_x;
-	float	pos_y;
+	double			pos_x;
+	double			pos_y;
+	double			pos_z;
+	double			dir_x;
+	double			dir_y;
+	double			move_speed;
+	int				cry;
+	int				move_x;
+	int				move_y;
+	int				fire_rate;
+	struct timeval	last_tear;
 }				t_partner;
 
 typedef struct s_sprite_data

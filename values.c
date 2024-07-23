@@ -178,6 +178,7 @@ void	init_vals(t_box *box)
 	box->player.n_key = 0;
 	box->hud = 1;
 	box->game_state = IN_TITLE_MENU;
+	box->conn_state = -1;
 	box->pause_menu_choice = 0;
 	box->start_menu_choice = 0;
 	box->options_menu_choice = 0;
@@ -186,6 +187,9 @@ void	init_vals(t_box *box)
 	box->input_ip_index = 0;
 	box->input_ip[0] = '\0';
 	box->frame = 0;
+	box->partner.fire_rate = 50;
+	box->partner.cry = 0;
+	gettimeofday(&box->partner.last_tear, NULL);
 	gettimeofday(&box->conn_time, NULL);
 }
 

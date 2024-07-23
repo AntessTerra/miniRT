@@ -64,7 +64,7 @@ int init_server(t_box *box, int port)
 	if (box->epoll_sock < 0)
 		return (printf("ERROR CREATING EPOLL\n"), 1);
 
-	ev.events = EPOLLIN | EPOLLET;
+	ev.events = EPOLLIN;
 	ev.data.fd = box->server_sock;
 
 	if(epoll_ctl(box->epoll_sock, EPOLL_CTL_ADD, box->server_sock, &ev))
@@ -95,7 +95,7 @@ int init_client(t_box *box, int port)
 	if (box->epoll_sock < 0)
 		return (printf("ERROR CREATING EPOLL\n"), 1);
 
-	ev.events = EPOLLIN | EPOLLET;
+	ev.events = EPOLLIN;
 	ev.data.fd = box->server_sock;
 
 	if(epoll_ctl(box->epoll_sock, EPOLL_CTL_ADD, box->server_sock, &ev))
@@ -123,9 +123,16 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 
 		if (n < 0)
 			return (1);
-		printf("PARNTER CORDS: %f	%f\n", another_one.pos_x, another_one.pos_y);
 		box->partner.pos_x = another_one.pos_x;
 		box->partner.pos_y = another_one.pos_y;
+		box->partner.dir_x = another_one.dir_x;
+		box->partner.dir_y = another_one.dir_y;
+		box->partner.move_speed = another_one.move_speed;
+		box->partner.cry = another_one.cry;
+		box->partner.move_x = another_one.move_x;
+		box->partner.move_y = another_one.move_y;
+		box->partner.pos_z = another_one.pos_z;
+		// printf("PARNTER CORDS: %f	%f	CRY:%i\n", box->partner.pos_x, box->partner.pos_y, box->partner.cry);
 	}
 	else
 	{
@@ -162,7 +169,7 @@ int send_message(int fd, void *message, int length, struct sockaddr_in *client_a
 {
 	// printf("Started sending: %s to fd %i\n", message, fd);
 	int n = sendto(fd, message, length, 0, (struct sockaddr *)client_address, *client_address_len);
-	printf("DATA SEND: %i\n", n);
+	// printf("DATA SEND: %i\n", n);
 	if (n < 0)
 		return (printf("ERROR SENDING %s\n", strerror(errno)), 1);
 	// printf("Send: %s to fd %i\n", message, fd);

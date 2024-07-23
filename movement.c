@@ -127,7 +127,7 @@ void	cal_move(t_box *box)
 		box->info.pos_z -= 100 * box->info.move_speed;
 	if (box->player.cry)
 	{
-		// printf("TIME SINCE LAST SHOT %f > %f\n", (box->time.tv_sec - box->player.last_tear.tv_sec + ((box->time.tv_usec - box->player.last_tear.tv_usec) / 1000000.0)), box->player.fire_rate / 100.0);
+		// printf("PLAYERS TIME SINCE LAST SHOT %f > %f\n", (box->time.tv_sec - box->player.last_tear.tv_sec + ((box->time.tv_usec - box->player.last_tear.tv_usec) / 1000000.0)), box->player.fire_rate / 100.0);
 		if (((box->time.tv_sec - box->player.last_tear.tv_sec + ((box->time.tv_usec - box->player.last_tear.tv_usec) / 1000000.0))) > box->player.fire_rate / 100.0)
 		{
 			gettimeofday(&box->player.last_tear, NULL);
@@ -275,7 +275,7 @@ void	cal_sprite_move(t_box *box)
 				sprites->data->y += sprites->data->dir_y * 0.1 * box->info.ene_move_speed;
 			}
 		}
-		if (sprites->data->texture < TEAR && sprites->data->texture != DOOR)
+		if (sprites->data->texture < TEAR && sprites->data->texture != DOOR && sprites->data->texture != ISAAC)
 		{
 			if (box->player.hit)
 			{
@@ -382,7 +382,7 @@ void	cal_sprite_move(t_box *box)
 					if (1 > ((obj->data->x - sprites->data->x)
 							* (obj->data->x - sprites->data->x)
 							+ (obj->data->y - sprites->data->y)
-							* (obj->data->y - sprites->data->y)) * 100 && obj->data->texture < TEAR
+							* (obj->data->y - sprites->data->y)) * 100 && obj->data->texture < TEAR && obj->data->texture != ISAAC
 							&& obj->data->hit == 0)
 						{
 							sprite_hit(box, sprites, obj);
@@ -447,6 +447,61 @@ void	cal_sprite_move(t_box *box)
 		}
 		if (sprites->data->texture == ISAAC)
 		{
+			gettimeofday(&box->time, NULL);
+			if (box->partner.move_x == 1)
+			{
+				if ((box->map[(int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
+					|| (box->map[(int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
+					box->partner.pos_x += box->partner.dir_x * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed))->data->state == OPEN))
+					box->partner.pos_y += box->partner.dir_y * box->partner.move_speed;
+			}
+			else if (box->partner.move_x == -1)
+			{
+				if ((box->map[(int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
+					|| (box->map[(int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
+					box->partner.pos_x -= box->partner.dir_x * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed))->data->state == OPEN))
+					box->partner.pos_y -= box->partner.dir_y * box->partner.move_speed;
+			}
+			if (box->partner.move_y == 1)
+			{
+				if ((box->map[(int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
+					|| (box->map[(int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
+					box->partner.pos_x += box->partner.dir_y * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed))->data->state == OPEN))
+					box->partner.pos_y -= box->partner.dir_x * box->partner.move_speed;
+			}
+			else if (box->partner.move_y == -1)
+			{
+				if ((box->map[(int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
+					|| (box->map[(int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
+					box->partner.pos_x -= box->partner.dir_y * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed))->data->state == OPEN))
+					box->partner.pos_y += box->partner.dir_x * box->partner.move_speed;
+			}
+			if (box->partner.cry)
+			{
+				// printf("PARTNERS TIME SINCE LAST SHOT %f > %f\n", (box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0)), box->partner.fire_rate / 100.0);
+				if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) > box->partner.fire_rate / 100.0)
+				{
+					gettimeofday(&box->partner.last_tear, NULL);
+					sprite_append(box, box->partner.pos_x, box->partner.pos_y, TEAR);
+					sound_play(box, &box->sound.sfx[SHOT]);
+				}
+			}
 			sprites->data->x = box->partner.pos_x;
 			sprites->data->y = box->partner.pos_y;
 		}
