@@ -350,7 +350,7 @@ void	cast_obj(t_box *box)
 					{
 						if (box->info.tex_y < 47 && box->info.tex_y > 15)
 						{
-							if (sprites->data->dist < 2)
+							if (sprites->data->dist < 2 || sprites->data->partner_dist < 2)
 							{
 								sprites->data->state = AWAKE;
 								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[(box->info.tex_x * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 16]);
@@ -465,7 +465,10 @@ void	cast_obj(t_box *box)
 					{
 						if (box->info.tex_x < 56 && box->info.tex_x > 20 && box->info.tex_y < 60 && box->info.tex_y > 12)
 						{
-							box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 32 * ((int)(box->time.tv_usec / 100000.0))) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
+							if (box->partner.info.move_x != 0 || box->partner.info.move_y != 0)
+								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 32 * ((int)(box->time.tv_usec / 100000.0))) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
+							else
+								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[(box->info.tex_x - 16) * 4 + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
 							if ((box->info.color & 0x00FFFFFF) != 0)
 							{
 								hit_mark(box, sprites);
@@ -476,7 +479,8 @@ void	cast_obj(t_box *box)
 								else
 									my_mlx_pyxel_put(&box->shaders, box->info.stripe, box->info.part, pixel_visibility(0));
 							}
-							box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+							if (box->info.tex_y < 50)
+								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
 						}
 						else
 							box->info.color = 0;

@@ -89,8 +89,8 @@ void	sprite_append(t_box *box, float x, float y, int texture)
 		new->data->texture = texture;
 	if (box->partner.cry)
 	{
-		new->data->dir_x = box->partner.dir_x;
-		new->data->dir_y = box->partner.dir_y;
+		new->data->dir_x = box->partner.info.dir_x;
+		new->data->dir_y = box->partner.info.dir_y;
 	}
 	else
 	{

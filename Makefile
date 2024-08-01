@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 
-NAME = cub3d
+NAME = doom-nukem
 CFLAGS = -Wall -Wextra -Werror -g #fsanitize=address
 LIBFT = Libft
 MLX = minilibx

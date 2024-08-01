@@ -212,8 +212,16 @@ void	cal_sprite_move(t_box *box)
 	{
 		if (sprites->data->texture == LARRY_JR_HEAD)
 		{
-			box->info.t_angle = atan2(sprites->data->y - box->info.pos_y, sprites->data->x - box->info.pos_x);
-			box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->info.start_dir_y, box->info.start_dir_x);
+			if (sprites->data->partner_dist < sprites->data->dist)
+			{
+				box->info.t_angle = atan2(sprites->data->y - box->partner.info.pos_y, sprites->data->x - box->partner.info.pos_x);
+				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->partner.info.start_dir_y, box->partner.info.start_dir_x);
+			}
+			else
+			{
+				box->info.t_angle = atan2(sprites->data->y - box->info.pos_y, sprites->data->x - box->info.pos_x);
+				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->info.start_dir_y, box->info.start_dir_x);
+			}
 			if (box->info.t_angle < 0)
 				box->info.t_angle += 2 * PI;
 			if (box->info.now_angle < 0)
@@ -305,8 +313,16 @@ void	cal_sprite_move(t_box *box)
 
 		if (sprites->data->texture == LEECH || (sprites->data->texture == BABY && sprites->data->state == AWAKE))
 		{
-			box->info.t_angle = atan2(sprites->data->y - box->info.pos_y, sprites->data->x - box->info.pos_x);
-			box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->info.start_dir_y, box->info.start_dir_x);
+			if (sprites->data->partner_dist < sprites->data->dist)
+			{
+				box->info.t_angle = atan2(sprites->data->y - box->partner.info.pos_y, sprites->data->x - box->partner.info.pos_x);
+				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->partner.info.start_dir_y, box->partner.info.start_dir_x);
+			}
+			else
+			{
+				box->info.t_angle = atan2(sprites->data->y - box->info.pos_y, sprites->data->x - box->info.pos_x);
+				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->info.start_dir_y, box->info.start_dir_x);
+			}
 			if (box->info.t_angle < 0)
 				box->info.t_angle += 2 * PI;
 			if (box->info.now_angle < 0)
@@ -429,12 +445,21 @@ void	cal_sprite_move(t_box *box)
 				break;
 			}
 		}
-		if (sprites->data->texture == KEY && sprites->data->dist < 0.1 && sprites->data->dist != 0)
+		if (sprites->data->texture == KEY)
 		{
-			box->player.n_key++;
-			sound_play(box, &box->sound.sfx[KEY_PICKUP]);
-			sprite_remove(box, sprites);
-			break;
+			if (sprites->data->dist < 0.1 && sprites->data->dist != 0)
+			{
+				box->player.n_key++;
+				sound_play(box, &box->sound.sfx[KEY_PICKUP]);
+				sprite_remove(box, sprites);
+				break;
+			}
+			else if (sprites->data->partner_dist < 0.1 && sprites->data->partner_dist != 0)
+			{
+				sound_play(box, &box->sound.sfx[KEY_PICKUP]);
+				sprite_remove(box, sprites);
+				break;
+			}
 		}
 		if (sprites->data->texture == TROPHY && sprites->data->dist < 0.1 && sprites->data->dist != 0)
 		{
@@ -448,49 +473,61 @@ void	cal_sprite_move(t_box *box)
 		if (sprites->data->texture == ISAAC)
 		{
 			gettimeofday(&box->time, NULL);
-			if (box->partner.move_x == 1)
+			if (box->partner.info.rotate == 1)
 			{
-				if ((box->map[(int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
-					|| (box->map[(int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x + box->partner.dir_x * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
-					box->partner.pos_x += box->partner.dir_x * box->partner.move_speed;
-				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed)] == '0')
-					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed)] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y + box->partner.dir_y * box->partner.move_speed))->data->state == OPEN))
-					box->partner.pos_y += box->partner.dir_y * box->partner.move_speed;
+				box->partner.info.old_dir_x = box->partner.info.dir_x;
+				box->partner.info.dir_x = box->partner.info.dir_x * cos(-box->partner.info.rot_speed) - box->partner.info.dir_y * sin(-box->partner.info.rot_speed);
+				box->partner.info.dir_y = box->partner.info.old_dir_x * sin(-box->partner.info.rot_speed) + box->partner.info.dir_y * cos(-box->partner.info.rot_speed);
 			}
-			else if (box->partner.move_x == -1)
+			else if (box->partner.info.rotate == -1)
 			{
-				if ((box->map[(int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
-					|| (box->map[(int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x - box->partner.dir_x * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
-					box->partner.pos_x -= box->partner.dir_x * box->partner.move_speed;
-				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed)] == '0')
-					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed)] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y - box->partner.dir_y * box->partner.move_speed))->data->state == OPEN))
-					box->partner.pos_y -= box->partner.dir_y * box->partner.move_speed;
+				box->partner.info.old_dir_x = box->partner.info.dir_x;
+				box->partner.info.dir_x = box->partner.info.dir_x * cos(box->partner.info.rot_speed) - box->partner.info.dir_y * sin(box->partner.info.rot_speed);
+				box->partner.info.dir_y = box->partner.info.old_dir_x * sin(box->partner.info.rot_speed) + box->partner.info.dir_y * cos(box->partner.info.rot_speed);
 			}
-			if (box->partner.move_y == 1)
+			if (box->partner.info.move_x == 1)
 			{
-				if ((box->map[(int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
-					|| (box->map[(int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x + box->partner.dir_y * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
-					box->partner.pos_x += box->partner.dir_y * box->partner.move_speed;
-				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed)] == '0')
-					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed)] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y - box->partner.dir_x * box->partner.move_speed))->data->state == OPEN))
-					box->partner.pos_y -= box->partner.dir_x * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x + box->partner.info.dir_x * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x + box->partner.info.dir_x * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x + box->partner.info.dir_x * box->partner.info.move_speed), (int)box->partner.info.pos_y)->data->state == OPEN))
+					box->partner.info.pos_x += box->partner.info.dir_x * box->partner.info.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y + box->partner.info.dir_y * box->partner.info.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y + box->partner.info.dir_y * box->partner.info.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x), (int)(box->partner.info.pos_y + box->partner.info.dir_y * box->partner.info.move_speed))->data->state == OPEN))
+					box->partner.info.pos_y += box->partner.info.dir_y * box->partner.info.move_speed;
 			}
-			else if (box->partner.move_y == -1)
+			else if (box->partner.info.move_x == -1)
 			{
-				if ((box->map[(int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0')
-					|| (box->map[(int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed)][(int)box->partner.pos_y] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x - box->partner.dir_y * box->partner.move_speed), (int)box->partner.pos_y)->data->state == OPEN))
-					box->partner.pos_x -= box->partner.dir_y * box->partner.move_speed;
-				if ((box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed)] == '0')
-					|| (box->map[(int)(box->partner.pos_x)][(int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed)] == '0' + DOOR + 1
-						&& find_door(box, (int)(box->partner.pos_x), (int)(box->partner.pos_y + box->partner.dir_x * box->partner.move_speed))->data->state == OPEN))
-					box->partner.pos_y += box->partner.dir_x * box->partner.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x - box->partner.info.dir_x * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x - box->partner.info.dir_x * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x - box->partner.info.dir_x * box->partner.info.move_speed), (int)box->partner.info.pos_y)->data->state == OPEN))
+					box->partner.info.pos_x -= box->partner.info.dir_x * box->partner.info.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y - box->partner.info.dir_y * box->partner.info.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y - box->partner.info.dir_y * box->partner.info.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x), (int)(box->partner.info.pos_y - box->partner.info.dir_y * box->partner.info.move_speed))->data->state == OPEN))
+					box->partner.info.pos_y -= box->partner.info.dir_y * box->partner.info.move_speed;
+			}
+			if (box->partner.info.move_y == 1)
+			{
+				if ((box->map[(int)(box->partner.info.pos_x + box->partner.info.dir_y * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x + box->partner.info.dir_y * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x + box->partner.info.dir_y * box->partner.info.move_speed), (int)box->partner.info.pos_y)->data->state == OPEN))
+					box->partner.info.pos_x += box->partner.info.dir_y * box->partner.info.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y - box->partner.info.dir_x * box->partner.info.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y - box->partner.info.dir_x * box->partner.info.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x), (int)(box->partner.info.pos_y - box->partner.info.dir_x * box->partner.info.move_speed))->data->state == OPEN))
+					box->partner.info.pos_y -= box->partner.info.dir_x * box->partner.info.move_speed;
+			}
+			else if (box->partner.info.move_y == -1)
+			{
+				if ((box->map[(int)(box->partner.info.pos_x - box->partner.info.dir_y * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x - box->partner.info.dir_y * box->partner.info.move_speed)][(int)box->partner.info.pos_y] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x - box->partner.info.dir_y * box->partner.info.move_speed), (int)box->partner.info.pos_y)->data->state == OPEN))
+					box->partner.info.pos_x -= box->partner.info.dir_y * box->partner.info.move_speed;
+				if ((box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y + box->partner.info.dir_x * box->partner.info.move_speed)] == '0')
+					|| (box->map[(int)(box->partner.info.pos_x)][(int)(box->partner.info.pos_y + box->partner.info.dir_x * box->partner.info.move_speed)] == '0' + DOOR + 1
+						&& find_door(box, (int)(box->partner.info.pos_x), (int)(box->partner.info.pos_y + box->partner.info.dir_x * box->partner.info.move_speed))->data->state == OPEN))
+					box->partner.info.pos_y += box->partner.info.dir_x * box->partner.info.move_speed;
 			}
 			if (box->partner.cry)
 			{
@@ -498,12 +535,14 @@ void	cal_sprite_move(t_box *box)
 				if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) > box->partner.fire_rate / 100.0)
 				{
 					gettimeofday(&box->partner.last_tear, NULL);
-					sprite_append(box, box->partner.pos_x, box->partner.pos_y, TEAR);
+					sprite_append(box, box->partner.info.pos_x, box->partner.info.pos_y, TEAR);
 					sound_play(box, &box->sound.sfx[SHOT]);
 				}
 			}
-			sprites->data->x = box->partner.pos_x;
-			sprites->data->y = box->partner.pos_y;
+			sprites->data->x = box->partner.info.pos_x;
+			sprites->data->y = box->partner.info.pos_y;
+			sprites->data->dir_x = box->partner.info.dir_x;
+			sprites->data->dir_y = box->partner.info.dir_y;
 		}
 		if (sprites->data->texture == DOOR)
 		{

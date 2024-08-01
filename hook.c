@@ -12,21 +12,6 @@
 
 #include "cub3d.h"
 
-void	send_update(t_box *box)
-{
-	t_partner partner;
-	partner.pos_x = box->info.pos_x;
-	partner.pos_y = box->info.pos_y;
-	partner.move_x = box->info.move_x;
-	partner.move_y = box->info.move_y;
-	partner.dir_x = box->info.dir_x;
-	partner.dir_y = box->info.dir_y;
-	partner.move_speed = box->info.move_speed;
-	partner.cry = box->player.cry;
-	partner.pos_z = box->info.pos_z;
-	send_message(box->server_sock, &partner, sizeof(struct s_partner), &box->server_addr, &box->addr_len);
-}
-
 int	mouse_move(int x, int y, t_box *box)
 {
 	if (box->game_state == IN_PAUSE_MENU)
@@ -77,7 +62,6 @@ int	mouse_press(int keycode, int x, int y, t_box *box)
 			box->player.cry = 1;
 		if (keycode == 3)
 			action_door(box);
-		send_update(box);
 	}
 	else if (box->game_state == IN_PAUSE_MENU)
 	{
@@ -209,8 +193,6 @@ int	mouse_release(int keycode, int x, int y, t_box *box)
 	(void)y;
 	if (keycode == 1)
 		box->player.cry = 0;
-	if (box->game_state == RUNNING_LAN)
-		send_update(box);
 	return (0);
 }
 
@@ -254,9 +236,6 @@ int	key_press(int key, t_box *box)
 	}
 	if ((key == 32 || key == 65293) && box->game_state == IN_TITLE_MENU)
 		box->game_state = IN_START_MENU;
-	if (box->game_state == RUNNING_LAN && key != 65293 && key != 65307)
-		send_update(box);
-
 	// printf("Key pressed: %c, Current buffer: %s\n", (char)key, box->input_buffer);
 	// printf("Key pressed: %i\n", key);
 	// printf("CURRENT POSSITION: %f	%f\n", box->info.pos_x, box->info.pos_y);
@@ -303,22 +282,11 @@ int	key_release(int key, t_box *box)
 			box->game_state = IN_TITLE_MENU;
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
-		else if (box->game_state == JOINING_GAME && (box->conn_state == CLIENT_SERVER_NOT_FOUND || box->conn_state == CLIENT_WAITING_FOR_INPUT))
+		else if ((box->game_state == JOINING_GAME && (box->conn_state == CLIENT_SERVER_NOT_FOUND || box->conn_state == CLIENT_WAITING_FOR_INPUT))
+					|| box->game_state == HOSTING_GAME || box->game_state == CONNECTION_LOST)
 		{
 			box->input_ip_index = 0;
 			box->input_ip[0] = '\0';
-			close(box->server_sock);
-			close(box->epoll_sock);
-			if (box->sprites != NULL)
-			{
-				free_sprites(box);
-				free_map(box);
-				init_vals(box);
-			}
-			box->game_state = IN_START_MENU;
-		}
-		else if (box->game_state == HOSTING_GAME)
-		{
 			close(box->server_sock);
 			close(box->epoll_sock);
 			if (box->sprites != NULL)
@@ -365,28 +333,16 @@ int	key_release(int key, t_box *box)
 			if (init_client(box, 25565))
 				return (printf("ERROR INITIALIZING CLIENT\n"), 1);
 			gettimeofday(&box->conn_time, NULL);
-			send_message(box->server_sock, "Hello from client", ft_strlen("Hello from client"), &box->server_addr, &box->addr_len);
-			printf("SEND HELLO TO SERVER!\n");
+			send_update(box, "Hello from client");
 		}
 	}
 	if (box->game_state == HOSTING_GAME && box->conn_state == SERVER_READY && key == 65293)
 	{
-		send_message(box->server_sock, "START GAME", ft_strlen("START GAME"), &box->server_addr, &box->addr_len);
+		send_update(box, "START GAME");
 		box->game_state = RUNNING_LAN;
 		gettimeofday(&box->time, NULL);
 	}
-	if (box->game_state == RUNNING_LAN && key != 65293 && key != 65307)
-		send_update(box);
-	// if (box->game_state == RUNNING_LAN && box->conn_state == SERVER_READY && key != 65293 && key != 65307)
-	// 	send_message(box->server.server_sock, box, sizeof(struct s_box), &box->server.client_addr, &box->server.addr_len);
-	// if (box->game_state == RUNNING_LAN && box->conn_state == CLIENT_READY && key != 65293 && key != 65307)
-	// 	send_message(box->client.server_sock, box, sizeof(struct s_box), &box->client.server_addr, &box->client.addr_len);
 
-	// int packet;
-	// packet = (1 << 24) | (0 << 16) | key;
-	// printf("Key released: ");
-	// print_binary(packet);
-	// printf("\n");
 	// printf("Key released: %i\n", key);
 	return (0);
 }

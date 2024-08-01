@@ -40,7 +40,7 @@
 # include <stdbool.h>
 # include <errno.h>
 
-# define MOUSE_CONTROL 1
+# define MOUSE_CONTROL 0
 # define SCREENWIDTH 1280
 # define SCREENHEIGHT 720
 # define TEXTUREWIDTH 64
@@ -216,7 +216,8 @@ typedef enum e_texture_numbers
 	OPTIONS_MENU,
 	OPTIONS_MENU_DARK,
 	FONT,
-	FONT_GRAY
+	FONT_GRAY,
+	WIFI
 }				t_texture_numbers;
 
 //Game states
@@ -224,6 +225,7 @@ typedef enum e_game_state
 {
 	RUNNING,
 	RUNNING_LAN,
+	CONNECTION_LOST,
 	IN_TITLE_MENU,
 	IN_START_MENU,
 	IN_START_OPTIONS,
@@ -256,17 +258,13 @@ static const char *CONN_STATE[] = {
 
 typedef struct s_partner
 {
-	double			pos_x;
-	double			pos_y;
-	double			pos_z;
-	double			dir_x;
-	double			dir_y;
-	double			move_speed;
+	t_info			info;
 	int				cry;
-	int				move_x;
-	int				move_y;
 	int				fire_rate;
+	int				max_hp;
+	int				hp;
 	struct timeval	last_tear;
+	char			message[1024];
 }				t_partner;
 
 typedef struct s_sprite_data
@@ -279,6 +277,7 @@ typedef struct s_sprite_data
 	int						id;
 	t_texture_numbers		texture;
 	double					dist;
+	double					partner_dist;
 	double					dir_x;
 	double					dir_y;
 	int						state;
@@ -365,6 +364,7 @@ typedef struct s_box
 	}				player;
 
 	t_partner		partner;
+	t_partner		packet;
 	int				n_sprites;
 	char			**map;
 	int				map_width;
@@ -407,6 +407,7 @@ typedef struct s_box
 	struct sockaddr_in	server_addr;
 	socklen_t			addr_len;
 	struct timeval		conn_time;
+	struct timeval		last_message_time;
 	int					frame;
 	int					epoll_sock;
 	struct epoll_event	events[5];
@@ -515,7 +516,8 @@ int			count_sprites(t_box *box);
 int			get_ip(t_box* box);
 int			init_server(t_box *box, int port);
 int			init_client(t_box *box, int port);
-int 		send_message(int fd, void *msg, int length, struct sockaddr_in *client_address, socklen_t *client_address_len);
+
+void		send_update(t_box *box, char *message);
 int 		receive_message(t_box *box, int fd, struct sockaddr_in *client_address, socklen_t *client_address_len);
 
 #endif

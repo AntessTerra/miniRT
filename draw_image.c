@@ -240,6 +240,19 @@ void	draw_hud(t_box *box)
 		else
 			my_mlx_put_image_to_window(box, &box->textures[UI_HEARTS], 50 + (i * 32), 15, 2);
 	}
+	if (box->game_state == RUNNING_LAN)
+	{
+		i = -1;
+		while (++i < ((box->partner.max_hp + 1) / 2))
+		{
+			if (i < (box->partner.hp / 2))
+				my_mlx_put_image_to_window(box, &box->textures[UI_HEARTS], 700 + (i * 32), 15, 0);
+			else if (box->partner.hp % 2 == 1 && i == (box->partner.hp / 2))
+				my_mlx_put_image_to_window(box, &box->textures[UI_HEARTS], 700 + (i * 32), 15, 1);
+			else
+				my_mlx_put_image_to_window(box, &box->textures[UI_HEARTS], 700 + (i * 32), 15, 2);
+		}
+	}
 }
 
 /*	Redraw

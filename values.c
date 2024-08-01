@@ -81,6 +81,9 @@ void	init_textures(t_box *box)
 
 	png_file_to_image(box->mlx, &box->textures[OPTIONS_MENU_DARK], "textures/optionsmenudark.png");
 	img_resize(box->mlx, &box->textures[OPTIONS_MENU_DARK], 2);
+
+	png_file_to_image(box->mlx, &box->textures[WIFI], "textures/wifi.png");
+	split_spritesheet(&box->textures[WIFI], 5, 1, 90, 112);
 	i = -1;
 	while (++i < 100)
 		if (box->textures[i].img == NULL)
@@ -191,6 +194,9 @@ void	init_vals(t_box *box)
 	box->partner.cry = 0;
 	gettimeofday(&box->partner.last_tear, NULL);
 	gettimeofday(&box->conn_time, NULL);
+	gettimeofday(&box->last_message_time, NULL);
+	box->partner.info.start_dir_x = -1.0;
+	box->partner.info.start_dir_y = 0;
 }
 
 void	reset_vals(t_box *box)
@@ -289,6 +295,11 @@ void	bubble_sort_sprites(t_box *box)
 				* (box->info.pos_x - sprites->data->x)
 				+ (box->info.pos_y - sprites->data->y)
 				* (box->info.pos_y - sprites->data->y));
+		if (box->game_state == RUNNING_LAN)
+			sprites->data->partner_dist = ((box->partner.info.pos_x - sprites->data->x)
+				* (box->partner.info.pos_x - sprites->data->x)
+				+ (box->partner.info.pos_y - sprites->data->y)
+				* (box->partner.info.pos_y - sprites->data->y));
 		sprites->data->travel = ((sprites->data->start_x - sprites->data->x)
 				* (sprites->data->start_x - sprites->data->x)
 				+ (sprites->data->start_y - sprites->data->y)
