@@ -84,6 +84,9 @@ void	init_textures(t_box *box)
 
 	png_file_to_image(box->mlx, &box->textures[WIFI], "textures/wifi.png");
 	split_spritesheet(&box->textures[WIFI], 5, 1, 90, 112);
+
+	png_file_to_image(box->mlx, &box->textures[DEATH_ANIMATION], "textures/death_animation.png");
+	split_spritesheet(&box->textures[DEATH_ANIMATION], 8, 2, 64, 64);
 	i = -1;
 	while (++i < 100)
 		if (box->textures[i].img == NULL)
@@ -118,6 +121,7 @@ void	init_sounds(t_box *box)
 	load_audio_file(&box->sound.sfx[PAIN], "sounds/pain.wav");
 	load_audio_file(&box->sound.sfx[SHOT], "sounds/shot.wav");
 	load_audio_file(&box->sound.sfx[SPLASH], "sounds/splash.wav");
+	load_audio_file(&box->sound.sfx[DEATH_GARRYS], "sounds/death_garrys.wav");
 
 	box->sound.playing[0].play = cs_play_sound(box->sound.ctx, box->sound.music.def);
 	cs_loop_sound(box->sound.playing[0].play, 1);
@@ -193,10 +197,12 @@ void	init_vals(t_box *box)
 	box->partner.fire_rate = 50;
 	box->partner.cry = 0;
 	gettimeofday(&box->partner.last_tear, NULL);
+	gettimeofday(&box->partner.hit_time, NULL);
 	gettimeofday(&box->conn_time, NULL);
 	gettimeofday(&box->last_message_time, NULL);
 	box->partner.info.start_dir_x = -1.0;
 	box->partner.info.start_dir_y = 0;
+	box->partner.info.hit = 0;
 }
 
 void	reset_vals(t_box *box)

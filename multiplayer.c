@@ -148,9 +148,19 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 	box->partner.info.dir_x = partner.info.dir_x;
 	box->partner.info.dir_y = partner.info.dir_y;
 	box->partner.info.move_speed = partner.info.move_speed;
+	box->partner.info.hit = partner.info.hit;
+	box->partner.hit_time = partner.hit_time;
 	box->partner.cry = partner.cry;
+	box->partner.fire_rate = partner.fire_rate;
 	box->partner.max_hp = partner.max_hp;
 	box->partner.hp = partner.hp;
+
+	if (!ft_strncmp(partner.message, "DEAD", 5))
+	{
+		gettimeofday(&box->partner.hit_time, NULL);
+		box->partner.hp = 0;
+		sound_play(box, &box->sound.sfx[DEATH_GARRYS]);
+	}
 	// printf("PARNTER CORDS: %f	%f	CRY:%i\n", box->partner.pos_x, box->partner.pos_y, box->partner.cry);
 	gettimeofday(&box->last_message_time, NULL);
 	return (0);
@@ -179,7 +189,10 @@ void	send_update(t_box *box, char *message)
 	box->packet.info.dir_x = box->info.dir_x;
 	box->packet.info.dir_y = box->info.dir_y;
 	box->packet.info.move_speed = box->info.move_speed;
+	box->packet.info.hit = box->player.hit;
+	box->packet.hit_time = box->player.hit_time;
 	box->packet.cry = box->player.cry;
+	box->packet.fire_rate = box->player.fire_rate;
 	box->packet.max_hp = box->player.max_hp;
 	box->packet.hp = box->player.hp;
 	ft_strlcpy(box->packet.message, message, ft_strlen(message) + 1);

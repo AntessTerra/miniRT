@@ -259,36 +259,184 @@ void	cast_wall(t_box *box)
 	}
 }
 
-void	cast_leech(t_box *box, t_sprite *sprites, int dir)
-{
-	if (dir == UP)
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 16]);
-	else if (dir == DOWN)
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 48]);
-	else if (dir == LEFT && !box->info.flipped)
-	{
-		box->info.tex_x = 46 - (box->info.tex_x - 16);
-		box->info.flipped = 1;
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
-	}
-	else
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
-}
+// void	cast_leech(t_box *box, t_sprite *sprites, int dir)
+// {
+// 	if (dir == UP)
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 16]);
+// 	else if (dir == DOWN)
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 48]);
+// 	else if (dir == LEFT && !box->info.flipped)
+// 	{
+// 		box->info.tex_x = 46 - (box->info.tex_x - 16);
+// 		box->info.flipped = 1;
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
+// 	}
+// 	else
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
+// }
 
-void	cast_larry(t_box *box, t_sprite *sprites, int dir)
+// void	cast_larry(t_box *box, t_sprite *sprites, int dir)
+// {
+// 	if (dir == UP)
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 32 + 48) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * (-20 + 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10))]);
+// 	else if (dir == DOWN)
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 28]);
+// 	else if (dir == LEFT && !box->info.flipped)
+// 	{
+// 		box->info.tex_x = 62 - (box->info.tex_x - 16);
+// 		box->info.flipped = 1;
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+// 	}
+// 	else
+// 		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+// }
+
+void	cast_sprite_direction(t_box *box, t_sprite *sprites)
 {
+	int dir;
+
+	if (sprites->data->dir_x < -0.7
+			&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
+	{
+		//PLAYER UP
+		if (box->info.dir_x < -0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = UP;
+		//PLAYER DOWN
+		else if (box->info.dir_x > 0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = DOWN;
+		//PLAYER LEFT
+		else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
+			&& box->info.dir_y < -0.7)
+			dir = RIGHT;
+		//PLAYER RIGHT
+		else
+			dir = LEFT;
+	}
+	//SPRITE DOWN
+	else if (sprites->data->dir_x > 0.7
+			&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
+	{
+		//PLAYER UP
+		if (box->info.dir_x < -0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = DOWN;
+		//PLAYER DOWN
+		else if (box->info.dir_x > 0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = UP;
+		//PLAYER LEFT
+		else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
+			&& box->info.dir_y < -0.7)
+			dir = LEFT;
+		//PLAYER RIGHT
+		else
+			dir = RIGHT;
+	}
+	//SPRITE LEFT
+	else if (sprites->data->dir_x > -0.75 && sprites->data->dir_x < 0.75
+			&& sprites->data->dir_y < -0.7 && !box->info.flipped)
+	{
+		//PLAYER UP
+		if (box->info.dir_x < -0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = LEFT;
+		//PLAYER DOWN
+		else if (box->info.dir_x > 0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = RIGHT;
+		//PLAYER LEFT
+		else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
+			&& box->info.dir_y < -0.7)
+			dir = UP;
+		//PLAYER RIGHT
+		else
+			dir = DOWN;
+	}
+	//SPRITE RIGHT
+	else
+	{
+		//PLAYER UP
+		if (box->info.dir_x < -0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = RIGHT;
+		//PLAYER DOWN
+		else if (box->info.dir_x > 0.7
+			&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
+			dir = LEFT;
+		//PLAYER LEFT
+		else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
+			&& box->info.dir_y < -0.7)
+			dir = DOWN;
+		//PLAYER RIGHT
+		else
+			dir = UP;
+	}
 	if (dir == UP)
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 32 + 48) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * (-20 + 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10))]);
+	{
+		if (sprites->data->texture == LEECH)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 16]);
+		else if (sprites->data->texture == LARRY_JR_HEAD)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 32 + 48) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * (-20 + 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10))]);
+		else if (sprites->data->texture == ISAAC)
+		{
+			if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) < 0.1)
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 200) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+			else
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 160) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+		}
+	}
 	else if (dir == DOWN)
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 28]);
+	{
+		if (sprites->data->texture == LEECH)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 48]);
+		else if (sprites->data->texture == LARRY_JR_HEAD)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 28]);
+		else if (sprites->data->texture == ISAAC)
+		{
+			if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) < 0.1)
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 40) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+			else
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+		}
+	}
 	else if (dir == LEFT && !box->info.flipped)
 	{
-		box->info.tex_x = 62 - (box->info.tex_x - 16);
-		box->info.flipped = 1;
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+		if (sprites->data->texture == LEECH)
+		{
+			box->info.tex_x = 46 - (box->info.tex_x - 16);
+			box->info.flipped = 1;
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
+		}
+		else if (sprites->data->texture == LARRY_JR_HEAD)
+		{
+			box->info.tex_x = 62 - (box->info.tex_x - 16);
+			box->info.flipped = 1;
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+		}
+		else if (sprites->data->texture == ISAAC)
+		{
+			if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) < 0.1)
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 280) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+			else
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 240) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+		}
 	}
 	else
-		box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+	{
+		if (sprites->data->texture == LEECH)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x + 16 + 32 * ((int)((box->time.tv_usec / 100000.0) * 6) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -16]);
+		else if (sprites->data->texture == LARRY_JR_HEAD)
+			box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 48 - 48 * ((int)((box->time.tv_usec / 100000.0) * 2) / 10)) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * -20]);
+		else if (sprites->data->texture == ISAAC)
+		{
+			if (((box->time.tv_sec - box->partner.last_tear.tv_sec + ((box->time.tv_usec - box->partner.last_tear.tv_usec) / 1000000.0))) < 0.1)
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 120) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+			else
+				box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 80) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
+		}
+	}
 }
 
 void	cast_obj(t_box *box)
@@ -377,110 +525,45 @@ void	cast_obj(t_box *box)
 					else if (sprites->data->texture == LEECH)
 					{
 						if (box->info.tex_x < 48 && box->info.tex_x > 15 && box->info.tex_y < 47 && box->info.tex_y > 15)
-						{
-							//SPRITE UP
-							if (sprites->data->dir_x < -0.7
-									&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, UP);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, DOWN);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_leech(box, sprites, RIGHT);
-								//PLAYER RIGHT
-								else
-									cast_leech(box, sprites, LEFT);
-							}
-							//SPRITE DOWN
-							else if (sprites->data->dir_x > 0.7
-									&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, DOWN);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, UP);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_leech(box, sprites, LEFT);
-								//PLAYER RIGHT
-								else
-									cast_leech(box, sprites, RIGHT);
-							}
-							//SPRITE LEFT
-							else if (sprites->data->dir_x > -0.75 && sprites->data->dir_x < 0.75
-									&& sprites->data->dir_y < -0.7 && !box->info.flipped)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, LEFT);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, RIGHT);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_leech(box, sprites, UP);
-								//PLAYER RIGHT
-								else
-									cast_leech(box, sprites, DOWN);
-							}
-							//SPRITE RIGHT
-							else
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, RIGHT);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_leech(box, sprites, LEFT);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_leech(box, sprites, DOWN);
-								//PLAYER RIGHT
-								else
-									cast_leech(box, sprites, UP);
-							}
-						}
+							cast_sprite_direction(box, sprites);
 						else
 							box->info.color = 0;
 					}
 					else if (sprites->data->texture == ISAAC)
 					{
-						if (box->info.tex_x < 56 && box->info.tex_x > 20 && box->info.tex_y < 60 && box->info.tex_y > 12)
+						if (box->partner.hp == 0 && box->info.tex_x > 5 && box->info.tex_y < 60 && box->info.tex_y > 12)
 						{
-							if (box->partner.info.move_x != 0 || box->partner.info.move_y != 0)
-								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 32 * ((int)(box->time.tv_usec / 100000.0))) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
+							sprites->data->frame = ((((box->time.tv_sec - box->partner.hit_time.tv_sec) + ((box->time.tv_usec - box->partner.hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+							if (sprites->data->frame < 14)
+								box->info.color = extract_color(&box->textures[DEATH_ANIMATION].addr[((box->info.tex_x - 5 + (64 * (sprites->data->frame % 8))) * 4) + box->textures[DEATH_ANIMATION].line_len * box->info.tex_y + box->textures[DEATH_ANIMATION].line_len * (-12 + ((sprites->data->frame / 8) * 64))]);
 							else
-								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[(box->info.tex_x - 16) * 4 + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
-							if ((box->info.color & 0x00FFFFFF) != 0)
+								box->info.color = extract_color(&box->textures[DEATH_ANIMATION].addr[((box->info.tex_x - 5 + 256) * 4) + box->textures[DEATH_ANIMATION].line_len * box->info.tex_y + box->textures[DEATH_ANIMATION].line_len * (-12 + 64)]);
+						}
+						else if (box->info.tex_x < 56 && box->info.tex_x > 20 && box->info.tex_y < 60 && box->info.tex_y > 12)
+						{
+							if (box->partner.info.hit && ((box->time.tv_sec - box->partner.hit_time.tv_sec + ((box->time.tv_usec - box->partner.hit_time.tv_usec) / 1000000.0))) < 0.5)
+								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 68) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 268]);
+							else
 							{
-								hit_mark(box, sprites);
-								// apply_fog(box, sprites->data->dist);
-								my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, 0xFF << 24 | box->info.color);
-								if (sprites->data->dist < 100)
-									my_mlx_pyxel_put(&box->shaders, box->info.stripe, box->info.part, pixel_visibility((float)(100 - (sprites->data->dist))/100));
+								//BODY
+								if (box->partner.info.move_x != 0 || box->partner.info.move_y != 0)
+									box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16 + 32 * ((int)(box->time.tv_usec / 100000.0))) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
 								else
-									my_mlx_pyxel_put(&box->shaders, box->info.stripe, box->info.part, pixel_visibility(0));
+									box->info.color = extract_color(&box->textures[sprites->data->texture].addr[(box->info.tex_x - 16) * 4 + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 42]);
+								if ((box->info.color & 0x00FFFFFF) != 0)
+								{
+									hit_mark(box, sprites);
+									// apply_fog(box, sprites->data->dist);
+									my_mlx_pyxel_put(&box->image, box->info.stripe, box->info.part, 0xFF << 24 | box->info.color);
+									if (sprites->data->dist < 100)
+										my_mlx_pyxel_put(&box->shaders, box->info.stripe, box->info.part, pixel_visibility((float)(100 - (sprites->data->dist))/100));
+									else
+										my_mlx_pyxel_put(&box->shaders, box->info.stripe, box->info.part, pixel_visibility(0));
+								}
+								//HEAD
+								if (box->info.tex_y < 50)
+									cast_sprite_direction(box, sprites);
 							}
-							if (box->info.tex_y < 50)
-								box->info.color = extract_color(&box->textures[sprites->data->texture].addr[((box->info.tex_x - 16) * 4) + box->textures[sprites->data->texture].line_len * box->info.tex_y + box->textures[sprites->data->texture].line_len * 8]);
 						}
 						else
 							box->info.color = 0;
@@ -492,87 +575,7 @@ void	cast_obj(t_box *box)
 					else if (sprites->data->texture == LARRY_JR_HEAD)
 					{
 						if (box->info.tex_x < 60 && box->info.tex_x > 20 && box->info.tex_y < 60 && box->info.tex_y > 25)
-						{
-							//SPRITE UP
-							if (sprites->data->dir_x < -0.7
-									&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, UP);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, DOWN);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_larry(box, sprites, RIGHT);
-								//PLAYER RIGHT
-								else
-									cast_larry(box, sprites, LEFT);
-							}
-							//SPRITE DOWN
-							else if (sprites->data->dir_x > 0.7
-									&& sprites->data->dir_y > -0.75 && sprites->data->dir_y < 0.75)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, DOWN);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, UP);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_larry(box, sprites, LEFT);
-								//PLAYER RIGHT
-								else
-									cast_larry(box, sprites, RIGHT);
-							}
-							//SPRITE LEFT
-							else if (sprites->data->dir_x > -0.75 && sprites->data->dir_x < 0.75
-									&& sprites->data->dir_y < -0.7 && !box->info.flipped)
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, LEFT);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, RIGHT);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_larry(box, sprites, UP);
-								//PLAYER RIGHT
-								else
-									cast_larry(box, sprites, DOWN);
-							}
-							//SPRITE RIGHT
-							else
-							{
-								//PLAYER UP
-								if (box->info.dir_x < -0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, RIGHT);
-								//PLAYER DOWN
-								else if (box->info.dir_x > 0.7
-									&& box->info.dir_y > -0.75 && box->info.dir_y < 0.75)
-									cast_larry(box, sprites, LEFT);
-								//PLAYER LEFT
-								else if (box->info.dir_x > -0.75 && box->info.dir_x < 0.75
-									&& box->info.dir_y < -0.7)
-									cast_larry(box, sprites, DOWN);
-								//PLAYER RIGHT
-								else
-									cast_larry(box, sprites, UP);
-							}
-						}
+							cast_sprite_direction(box, sprites);
 						else
 							box->info.color = 0;
 					}

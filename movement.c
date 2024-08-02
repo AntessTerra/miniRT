@@ -212,7 +212,7 @@ void	cal_sprite_move(t_box *box)
 	{
 		if (sprites->data->texture == LARRY_JR_HEAD)
 		{
-			if (sprites->data->partner_dist < sprites->data->dist)
+			if (sprites->data->partner_dist < sprites->data->dist && sprites->data->partner_dist != 0)
 			{
 				box->info.t_angle = atan2(sprites->data->y - box->partner.info.pos_y, sprites->data->x - box->partner.info.pos_x);
 				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->partner.info.start_dir_y, box->partner.info.start_dir_x);
@@ -299,6 +299,8 @@ void	cal_sprite_move(t_box *box)
 					box->player.hp -= 1;
 					if (box->player.hp < 1)
 					{
+						if (box->game_state == RUNNING_LAN)
+							send_update(box, "DEAD");
 						box->game_state = LOSE;
 						printf("YOU ARE DEAD!!!\n");
 						sound_play(box, &box->sound.sfx[FAIL]);
@@ -313,7 +315,7 @@ void	cal_sprite_move(t_box *box)
 
 		if (sprites->data->texture == LEECH || (sprites->data->texture == BABY && sprites->data->state == AWAKE))
 		{
-			if (sprites->data->partner_dist < sprites->data->dist)
+			if (sprites->data->partner_dist < sprites->data->dist  && sprites->data->partner_dist != 0)
 			{
 				box->info.t_angle = atan2(sprites->data->y - box->partner.info.pos_y, sprites->data->x - box->partner.info.pos_x);
 				box->info.now_angle = atan2(sprites->data->dir_y, sprites->data->dir_x) - atan2(box->partner.info.start_dir_y, box->partner.info.start_dir_x);
@@ -413,7 +415,6 @@ void	cal_sprite_move(t_box *box)
 		}
 		if (sprites->data->texture == ITEMS)
 		{
-			sprites->data->frame = ((((box->time.tv_sec - sprites->data->hit_time.tv_sec) + ((box->time.tv_usec - sprites->data->hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 			if (sprites->data->dist < 0.1)
 			{
 				if (sprites->data->id == 0)
@@ -473,6 +474,7 @@ void	cal_sprite_move(t_box *box)
 		if (sprites->data->texture == ISAAC)
 		{
 			gettimeofday(&box->time, NULL);
+			sprites->data->frame = ((((box->time.tv_sec - sprites->data->hit_time.tv_sec) + ((box->time.tv_usec - sprites->data->hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 			if (box->partner.info.rotate == 1)
 			{
 				box->partner.info.old_dir_x = box->partner.info.dir_x;

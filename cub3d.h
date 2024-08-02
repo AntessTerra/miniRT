@@ -217,7 +217,8 @@ typedef enum e_texture_numbers
 	OPTIONS_MENU_DARK,
 	FONT,
 	FONT_GRAY,
-	WIFI
+	WIFI,
+	DEATH_ANIMATION
 }				t_texture_numbers;
 
 //Game states
@@ -264,6 +265,7 @@ typedef struct s_partner
 	int				max_hp;
 	int				hp;
 	struct timeval	last_tear;
+	struct timeval	hit_time;
 	char			message[1024];
 }				t_partner;
 
@@ -326,6 +328,7 @@ typedef enum e_sound_tracks
 	PAIN,
 	SHOT,
 	SPLASH,
+	DEATH_GARRYS
 }				t_sound_tracks;
 
 typedef struct s_track
