@@ -233,6 +233,12 @@ int	key_press(int key, t_box *box)
 			else
 				box->hud = 1;
 		}
+		if (key == 65293 && box->partner.state == PARTNER_DOWNED)
+		{
+			box->partner.state = PARTNER_REVIVING;
+			gettimeofday(&box->partner.hit_time, NULL);
+			send_update(box, "REVIVING");
+		}
 	}
 	if ((key == 32 || key == 65293) && box->game_state == IN_TITLE_MENU)
 		box->game_state = IN_START_MENU;
@@ -283,7 +289,7 @@ int	key_release(int key, t_box *box)
 		else if (box->game_state == IN_TITLE_MENU)
 			exit_hook(box);
 		else if ((box->game_state == JOINING_GAME && (box->conn_state == CLIENT_SERVER_NOT_FOUND || box->conn_state == CLIENT_WAITING_FOR_INPUT))
-					|| box->game_state == HOSTING_GAME || box->game_state == CONNECTION_LOST)
+					|| box->game_state == HOSTING_GAME || box->game_state == CONNECTION_LOST || box->game_state == DOWNED)
 		{
 			box->input_ip_index = 0;
 			box->input_ip[0] = '\0';

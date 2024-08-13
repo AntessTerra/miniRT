@@ -296,20 +296,32 @@ void	cal_sprite_move(t_box *box)
 				box->player.hit = 1;
 				if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 				{
-					box->player.hp -= 1;
-					if (box->player.hp < 1)
+					if (box->player.hp > 0)
+					{
+						box->player.hp -= 1;
+						sound_play(box, &box->sound.sfx[OW]);
+						gettimeofday(&box->player.hit_time, NULL);
+					}
+					if (box->player.hp == 0)
 					{
 						if (box->game_state == RUNNING_LAN)
+						{
 							send_update(box, "DEAD");
-						box->game_state = LOSE;
-						printf("YOU ARE DEAD!!!\n");
-						sound_play(box, &box->sound.sfx[FAIL]);
-						gettimeofday(&box->fin_time, NULL);
+							box->game_state = DOWNED;
+							box->info.move_x = 0;
+							box->info.move_y = 0;
+							box->info.rotate = 0;
+						}
+						else
+						{
+							box->game_state = LOSE;
+							printf("YOU ARE DEAD!!!\n");
+							sound_play(box, &box->sound.sfx[FAIL]);
+							gettimeofday(&box->fin_time, NULL);
+						}
 						break;
 					}
-					sound_play(box, &box->sound.sfx[OW]);
 				}
-				gettimeofday(&box->player.hit_time, NULL);
 			}
 		}
 

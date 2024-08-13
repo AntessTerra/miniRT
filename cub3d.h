@@ -235,12 +235,17 @@ typedef enum e_game_state
 	HOSTING_GAME,
 	JOINING_GAME,
 	LOSE,
+	DOWNED,
+	REVIVING,
 	WIN
 }				t_game_state;
 
-static const char *GAME_STATE[] = {
-    "RUNNING", "RUNNING_LAN", "IN_TITLE_MENU", "IN_START_MENU", "IN_START_OPTIONS", "IN_PAUSE_MENU", "IN_PAUSE_OPTIONS", "HOSTING_GAME", "JOINING_GAME", "LOSE", "WIN",
-};
+typedef enum e_partner_state
+{
+	ALIVE,
+	PARTNER_DOWNED,
+	PARTNER_REVIVING,
+}				t_partner_state;
 
 //Connection states
 typedef enum t_conn_state
@@ -253,10 +258,6 @@ typedef enum t_conn_state
 	CLIENT_READY
 }				t_conn_state;
 
-static const char *CONN_STATE[] = {
-    "SERVER_LISTENING", "SERVER_READY", "CLIENT_WAITING_FOR_INPUT", "CLIENT_LISTENING", "CLIENT_SERVER_NOT_FOUND", "CLIENT_READY",
-};
-
 typedef struct s_partner
 {
 	t_info			info;
@@ -266,7 +267,9 @@ typedef struct s_partner
 	int				hp;
 	struct timeval	last_tear;
 	struct timeval	hit_time;
+	struct timeval	death_time;
 	char			message[1024];
+	t_partner_state	state;
 }				t_partner;
 
 typedef struct s_sprite_data

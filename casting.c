@@ -533,7 +533,7 @@ void	cast_obj(t_box *box)
 					{
 						if (box->partner.hp == 0 && box->info.tex_x > 5 && box->info.tex_y < 60 && box->info.tex_y > 12)
 						{
-							sprites->data->frame = ((((box->time.tv_sec - box->partner.hit_time.tv_sec) + ((box->time.tv_usec - box->partner.hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+							sprites->data->frame = ((((box->time.tv_sec - box->partner.death_time.tv_sec) + ((box->time.tv_usec - box->partner.death_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
 							if (sprites->data->frame < 14)
 								box->info.color = extract_color(&box->textures[DEATH_ANIMATION].addr[((box->info.tex_x - 5 + (64 * (sprites->data->frame % 8))) * 4) + box->textures[DEATH_ANIMATION].line_len * box->info.tex_y + box->textures[DEATH_ANIMATION].line_len * (-12 + ((sprites->data->frame / 8) * 64))]);
 							else

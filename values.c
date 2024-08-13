@@ -198,11 +198,13 @@ void	init_vals(t_box *box)
 	box->partner.cry = 0;
 	gettimeofday(&box->partner.last_tear, NULL);
 	gettimeofday(&box->partner.hit_time, NULL);
+	gettimeofday(&box->partner.death_time, NULL);
 	gettimeofday(&box->conn_time, NULL);
 	gettimeofday(&box->last_message_time, NULL);
 	box->partner.info.start_dir_x = -1.0;
 	box->partner.info.start_dir_y = 0;
 	box->partner.info.hit = 0;
+	box->partner.state = 0;
 }
 
 void	reset_vals(t_box *box)

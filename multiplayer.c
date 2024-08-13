@@ -148,8 +148,11 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 	box->partner.info.dir_x = partner.info.dir_x;
 	box->partner.info.dir_y = partner.info.dir_y;
 	box->partner.info.move_speed = partner.info.move_speed;
-	box->partner.info.hit = partner.info.hit;
-	box->partner.hit_time = partner.hit_time;
+	if (partner.hp > 0)
+	{
+		box->partner.info.hit = partner.info.hit;
+		box->partner.hit_time = partner.hit_time;
+	}
 	box->partner.cry = partner.cry;
 	box->partner.fire_rate = partner.fire_rate;
 	box->partner.max_hp = partner.max_hp;
@@ -157,9 +160,15 @@ int receive_message(t_box *box, int fd, struct sockaddr_in *client_address, sock
 
 	if (!ft_strncmp(partner.message, "DEAD", 5))
 	{
-		gettimeofday(&box->partner.hit_time, NULL);
+		gettimeofday(&box->partner.death_time, NULL);
 		box->partner.hp = 0;
+		box->partner.state = PARTNER_DOWNED;
 		sound_play(box, &box->sound.sfx[DEATH_GARRYS]);
+	}
+	if (!ft_strncmp(partner.message, "REVIVING", 9))
+	{
+		gettimeofday(&box->player.hit_time, NULL);
+		box->game_state = REVIVING;
 	}
 	// printf("PARNTER CORDS: %f	%f	CRY:%i\n", box->partner.pos_x, box->partner.pos_y, box->partner.cry);
 	gettimeofday(&box->last_message_time, NULL);

@@ -65,7 +65,7 @@ int	timer(t_box *box)
 	// 	send_update(box, "PING");
 	if ((box->packet.info.move_x != box->info.move_x || box->packet.info.move_y != box->info.move_y || box->packet.info.rotate != box->info.rotate ||
 		box->packet.cry != box->player.cry || box->packet.info.pos_z != box->info.pos_z || box->packet.hp != box->player.hp || box->packet.max_hp != box->player.max_hp)
-		&& box->game_state == RUNNING_LAN)
+		&& (box->game_state == RUNNING_LAN || box->game_state == DOWNED || box->game_state == REVIVING))
 		send_update(box, "UPDATE");
 	if (box->conn_state == SERVER_READY || box->conn_state == CLIENT_READY || box->game_state == HOSTING_GAME || box->conn_state == CLIENT_LISTENING)
 	{
@@ -218,6 +218,29 @@ int	timer(t_box *box)
 		string_to_graytext(box, 335, 350, "CONNECTION LOST,");
 		string_to_graytext(box, 300, 400, "PRESS ESC TO GO BACK");
 	}
+	else if (box->game_state == DOWNED || box->game_state == REVIVING)
+	{
+		mouse_hide(box, false);
+		redraw(box);
+		if (box->game_state == DOWNED)
+		{
+			string_to_graytext(box, 450, 350, "YOU DIED,");
+			string_to_graytext(box, 300, 400, "PRESS ESC TO GO BACK");
+			string_to_graytext(box, 300, 450, "OR WAIT FOR REVIVE");
+		}
+		else if (box->game_state == REVIVING)
+		{
+			box->frame = ((((box->time.tv_sec - box->player.hit_time.tv_sec) + ((box->time.tv_usec - box->player.hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+			// printf("REVIVING %is left\n", (int)(10 - (box->frame / 10)));
+			string_to_graytext(box, 250, 400, "YOU ARE BEING REVIVED");
+			mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU_DARK].img, 300, 450, 390, 480 + (32 * (int)(10 - (box->frame / 10))), 150, 32); //SFX VOLUME SLIDER
+			if (box->frame > 100)
+			{
+				box->game_state = RUNNING_LAN;
+				box->player.hp = 1;
+			}
+		}
+	}
 	else if (box->game_state == RUNNING || box->game_state == RUNNING_LAN)
 	{
 		if (box->game_state == RUNNING_LAN)
@@ -233,6 +256,18 @@ int	timer(t_box *box)
 			if (box->frame > 85 && box->frame < 150)
 				if (((int)((box->time.tv_usec / 100000.0) * 2) / 10) % 2 == 1)
 					my_mlx_put_image_to_window(box, &box->textures[WIFI], 600, 500, 3);
+			if (box->partner.state == PARTNER_REVIVING)
+			{
+				box->frame = ((((box->time.tv_sec - box->partner.hit_time.tv_sec) + ((box->time.tv_usec - box->partner.hit_time.tv_usec) / 1000000.0)) * 10) * 16) / 10;
+				string_to_graytext(box, 250, 400, "REVIVING PARTNER");
+				mlx_put_image_to_window(box->mlx, box->win, box->textures[OPTIONS_MENU_DARK].img, 300, 450, 390, 480 + (32 * (int)(10 - (box->frame / 10))), 150, 32); //SFX VOLUME SLIDER
+				// printf("PARTNER_REVIVING %is left\n", (int)(10 - (box->frame / 10)));
+				if (box->frame > 100)
+				{
+					box->partner.state = ALIVE;
+					box->partner.hp = 1;
+				}
+			}
 		}
 	}
 	else if (box->game_state == LOSE)
@@ -261,7 +296,7 @@ int	main(void)
 
 	init_vals(&box);
 	box.mlx = mlx_init();
-	box.win = mlx_new_window(box.mlx, SCREENWIDTH, SCREENHEIGHT, "cub3d");
+	box.win = mlx_new_window(box.mlx, SCREENWIDTH, SCREENHEIGHT, "doom-nukem");
 	init_textures(&box);
 	new_image(box.mlx, &box.image, SCREENWIDTH, SCREENHEIGHT);
 	new_image(box.mlx, &box.shaders, SCREENWIDTH, SCREENHEIGHT);
