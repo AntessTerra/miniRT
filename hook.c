@@ -208,14 +208,17 @@ int	key_press(int key, t_box *box)
 			box->info.rotate = -1;
 		if (key == 101)
 			box->info.rotate = 1;
-		if (key == 119 || key == 65362)
-			box->info.move_x = 1;
-		if (key == 115 || key == 65364)
-			box->info.move_x = -1;
-		if (key == 97 || key == 65361)
-			box->info.move_y = -1;
-		if (key == 100 || key == 65363)
-			box->info.move_y = 1;
+		if (box->partner.state != PARTNER_REVIVING)
+		{
+			if (key == 119 || key == 65362)
+				box->info.move_x = 1;
+			if (key == 115 || key == 65364)
+				box->info.move_x = -1;
+			if (key == 97 || key == 65361)
+				box->info.move_y = -1;
+			if (key == 100 || key == 65363)
+				box->info.move_y = 1;
+		}
 		if (key == 65505)
 			box->info.sprint = 1;
 		if (key == 65365)
@@ -233,7 +236,7 @@ int	key_press(int key, t_box *box)
 			else
 				box->hud = 1;
 		}
-		if (key == 65293 && box->partner.state == PARTNER_DOWNED)
+		if (key == 65293 && box->partner.state == PARTNER_DOWNED && box->player.dist_from_partner < 3)
 		{
 			box->partner.state = PARTNER_REVIVING;
 			gettimeofday(&box->partner.hit_time, NULL);

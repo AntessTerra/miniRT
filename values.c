@@ -304,10 +304,16 @@ void	bubble_sort_sprites(t_box *box)
 				+ (box->info.pos_y - sprites->data->y)
 				* (box->info.pos_y - sprites->data->y));
 		if (box->game_state == RUNNING_LAN)
+		{
 			sprites->data->partner_dist = ((box->partner.info.pos_x - sprites->data->x)
 				* (box->partner.info.pos_x - sprites->data->x)
 				+ (box->partner.info.pos_y - sprites->data->y)
 				* (box->partner.info.pos_y - sprites->data->y));
+			box->player.dist_from_partner = ((box->partner.info.pos_x - box->info.pos_x)
+					* (box->partner.info.pos_x - box->info.pos_x)
+					+ (box->partner.info.pos_y - box->info.pos_y)
+					* (box->partner.info.pos_y - box->info.pos_y));
+		}
 		sprites->data->travel = ((sprites->data->start_x - sprites->data->x)
 				* (sprites->data->start_x - sprites->data->x)
 				+ (sprites->data->start_y - sprites->data->y)

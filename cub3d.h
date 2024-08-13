@@ -365,6 +365,7 @@ typedef struct s_box
 		int				state;
 		int				frame;
 		int				hit;
+		int				dist_from_partner;
 		struct timeval	last_tear;
 		struct timeval	hit_time;
 	}				player;

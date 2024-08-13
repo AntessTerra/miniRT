@@ -43,7 +43,7 @@ lib:
 	@echo "Finished making libraries :D"
 
 $(NAME): $(OBJ)
-	@cc $(CFLAGS) -L $(LIBFT) -L $(MLX) -o $@ $^ $(MLX_FLAGS) cute_png/cute_png.o cute_sound/cute_sound.o
+	@cc $(CFLAGS) -L $(LIBFT) -L $(MLX) -o $@ $^ cute_png/cute_png.o cute_sound/cute_sound.o $(MLX_FLAGS)
 
 clean:
 	@make clean -C $(LIBFT)

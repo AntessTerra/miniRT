@@ -198,7 +198,7 @@ void	hit_mark(t_box *box, t_sprite *sprite)
 		sprite->data->frame = (((box->time.tv_sec - sprite->data->hit_time.tv_sec) + ((box->time.tv_usec - sprite->data->hit_time.tv_usec) / 1000000.0)) * 10);
 		//printf("FRAME: %i\n", sprite->data->frame);
 		if (sprite->data->frame < 1)
-				box->info.color = 0x00FF0000;
+			box->info.color = 0x00FF0000;
 		else
 			sprite->data->hit = 0;
 	}
@@ -290,7 +290,7 @@ void	redraw(t_box *box)
 	drawMinimap(box);
 	//single_square_test(box);
 
-	if (box->player.hit)
+	if (box->player.hit && box->player.hp > 0)
 		fill_screen_red(box);
 	my_mlx_put_image_to_window(box, &box->image, 0, 0, -1);
 	my_mlx_put_image_to_window(box, &box->shaders, 0, 0, -1);

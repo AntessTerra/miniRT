@@ -268,6 +268,8 @@ int	timer(t_box *box)
 					box->partner.hp = 1;
 				}
 			}
+			if (box->player.dist_from_partner < 3 && box->partner.state == PARTNER_DOWNED)
+				string_to_graytext(box, 250, 400, "PRESS ENTER TO REVIVE");
 		}
 	}
 	else if (box->game_state == LOSE)
