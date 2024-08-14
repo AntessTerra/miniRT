@@ -124,7 +124,7 @@ t_sprite	*find_door(t_box *box, int x, int y)
 		return (NULL);
 	while (sprites)
 	{
-		if (sprites->data->x == x && sprites->data->y == y && sprites->data->texture == DOOR)
+		if (sprites->data->x == x && sprites->data->y == y && sprites->data->texture == JAIL)
 			return (sprites);
 		sprites = sprites->next;
 	}
